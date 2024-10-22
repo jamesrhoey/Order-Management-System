@@ -15,28 +15,28 @@
             <div class="bg-dark col-auto min-vh-100 d-flex flex-column justify-content-between">
                 <div class="bg-dark p-2">
                     <a href="" class="d-flex text-decoration-none mt-1 align-items-center text-white">
-                        <span>Order System</span>
+                        <span>Tindahan Ni Ryzen</span>
                     </a>
                     <ul class="nav nav-pills  flex-column mt-4">
                         <li class="nav-item py-2 py-sm-0">
-                            <a href="#" class="nav-link text-white">
+                            <a href="index.html" class="nav-link active text-white">
                                 <i class="fa fa-gauge"></i><span class="fs-5 ms-3 d-none d-sm-inline">Dashboard</span>
                             </a>
                         </li>
                         <li class="nav-item  py-2 py-sm-0">
-                            <a href="#" class="nav-link text-white">
+                            <a href="order.html" class="nav-link  text-white">
                                 <i class="fa fa-clipboard" style="color: #ffffff;"></i><span
                                     class="fs-5 ms-3 d-none d-sm-inline">Orders</span>
                             </a>
                         </li>
                         <li class="nav-item  py-2 py-sm-0">
-                            <a href="#" class="nav-link text-white">
+                            <a href="product.html" class="nav-link text-white">
                                 <i class="fa fa-table-list" style="color: #ffffff;"></i><span
                                     class="fs-5 ms-3 d-none d-sm-inline">Products</span>
                             </a>
                         </li>
                         <li class="nav-item  py-2 py-sm-0">
-                            <a href="#" class="nav-link text-white">
+                            <a href="transaction.html" class="nav-link text-white">
                                 <i class="fa fa-money-check" style="color: #ffffff;"></i><span
                                     class="fs-5 ms-3 d-none d-sm-inline">Transaction</span>
                             </a>
@@ -47,7 +47,7 @@
                 <div class="dropdown open p-3">
                     <button class="btn border-none dropdown-toggle text-white" type="button" id="triggerId"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa-solid fa-user" style="color: #ffffff;"></i><span class="ms-2">User</span>
+                        <i class="fa-solid fa-user" style="color: #ffffff;"></i><span class="ms-2">Admin</span>
                     </button>
                     <div class="dropdown-menu" aria-labelledby="triggerId">
                         <button class="dropdown-item" href="#">Setting</button>
@@ -58,24 +58,11 @@
                 </div>
             </div>
 
-            <section class="container g-2 py-5">
+            <section class="container col-auto col-sm-6 col-md-10 g-2 py-5">
                 <div class="dropdown">
-                    <button class="btn rounded-3 wrapper" type="button" id="dropdownMenuButton1"
-                        data-bs-toggle="dropdown" data-hover="dropdown" aria-expanded="false">
-                        <i class="bi bi-filter me-1"></i>
-                        <span>Filter</span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
-                        <li>
-                            <a class="dropdown-item" onclick="filterAll()">All</a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" onclick="filterPassed()">Passed</a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" onclick="filterFailed()">Failed</a>
-                        </li>
-                    </ul>
+                    <input type="date" class="date form-control ">
+                    
+                    
 
                     <div class="table-responsive mt-4 p-4 wrapper rounded-3">
                         <table class="table table-scrollable">
@@ -94,50 +81,47 @@
                                 <tr class="align-middle">
                                     <td>1</td>
                                     <td>ryzen</td>
-                                    <td><time datetime="2017-02-14"></td>
-                                    <td></td>
-                                    <td>95</td>
-                                    <td><span class="passed">Passed</span></td>
+                                    <td>2017-02-14</td>
+                                    <td>08:30:45</td>
+                                    <td>Gcash</td>
+                                    <td><i class="fa-solid fa-eye" style="color: #1000f5;"></i></td>
+                                    <td><span class="completed">Completed</span></td>
                                 </tr>
                                 <tr class="align-middle">
-                                    <td>2</td>
-                                    <td>
-                                        <img src="angel.png" alt="Angel" class="student-avathar" />
-                                    </td>
-                                    <td>STDID120</td>
-                                    <td>Angel</td>
-                                    <td>50</td>
-                                    <td><span class="passed">Passed</span></td>
+                                    <td>1</td>
+                                    <td>ryzen</td>
+                                    <td>2017-02-14</td>
+                                    <td>08:30:45</td>
+                                    <td>Gcash</td>
+                                    <td><i class="fa-solid fa-eye" style="color: #1000f5;"></i></td>
+                                    <td><span class="pending">Pending</span></td>
                                 </tr>
                                 <tr class="align-middle">
-                                    <td>3</td>
-                                    <td>
-                                        <img src="adam.png" alt="Adam" class="student-avathar" />
-                                    </td>
-                                    <td>STDID136</td>
-                                    <td>Adam</td>
-                                    <td>40</td>
-                                    <td><span class="failed">Failed</span></td>
+                                    <td>1</td>
+                                    <td>ryzen</td>
+                                    <td>2017-02-14</td>
+                                    <td>08:30:45</td>
+                                    <td>Gcash</td>
+                                    <td><i class="fa-solid fa-eye" style="color: #1000f5;"></i></td>
+                                    <td><span class="pending">Pending</span></td>
                                 </tr>
                                 <tr class="align-middle">
-                                    <td>4</td>
-                                    <td>
-                                        <img src="sab.png" alt="Sab" class="student-avathar" />
-                                    </td>
-                                    <td>STDID030</td>
-                                    <td>Sab</td>
-                                    <td>97</td>
-                                    <td><span class="passed">Passed</span></td>
+                                    <td>1</td>
+                                    <td>ryzen</td>
+                                    <td>2017-02-14</td>
+                                    <td>08:30:45</td>
+                                    <td>Gcash</td>
+                                    <td><i class="fa-solid fa-eye" style="color: #1000f5;"></i></td>
+                                    <td><span class="completed">Completed</span></td>
                                 </tr>
                                 <tr class="align-middle">
-                                    <td>5</td>
-                                    <td>
-                                        <img src="sree.png" alt="Sree" class="student-avathar" />
-                                    </td>
-                                    <td>STDID233</td>
-                                    <td>Sree</td>
-                                    <td>20</td>
-                                    <td><span class="failed">Failed</span></td>
+                                    <td>1</td>
+                                    <td>ryzen</td>
+                                    <td>2017-02-14</td>
+                                    <td>08:30:45</td>
+                                    <td>Gcash</td>
+                                    <td><i class="fa-solid fa-eye" style="color: #1000f5;"></i></td>
+                                    <td><span class="completed">Completed</span></td>
                                 </tr>
                             </tbody>
                         </table>

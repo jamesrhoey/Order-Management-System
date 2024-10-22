@@ -12,7 +12,7 @@ function filterAll() {
 
 function filterPassed() {
     var status, found, table, tr, td, i, j;
-    status = "Passed";
+    status = "completed";
     table = document.getElementById("userDetails");
     tr = table.getElementsByTagName("tr");
     for (i = 0; i < tr.length; i++) {

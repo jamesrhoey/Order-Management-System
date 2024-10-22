@@ -9,7 +9,7 @@
     width: 3rem;
 }
 
-.passed {
+.completed {
     color: green;
     background-color: rgba(185, 255, 218, 0.4);
     padding: 6px;
@@ -20,7 +20,7 @@
     -o-border-radius: 2px;
 }
 
-.failed {
+.pending {
     color: red;
     background-color: rgba(241, 172, 172, 0.25);
     padding: 6px;
@@ -39,4 +39,7 @@
 .custom-dropdown-toggle {
     border: none !important;
     background: none !important;
+}
+.dates{
+    width: 80%;
 }
