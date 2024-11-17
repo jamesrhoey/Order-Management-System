@@ -3,7 +3,7 @@ require('dotenv').config(); // Load environment variables
 const express = require('express');
 const mongoose = require('mongoose');
 const multer = require('multer');
-
+const cors = require('cors'); 
 const workoutRoutes = require('./routes/workouts');
 const productRoutes = require('./routes/product');
 
@@ -14,12 +14,15 @@ const productRoutes = require('./routes/product');
 const app = express();
 const path = require('path');
 
+
+app.use('/api/products', cors(), productRoutes);
+ // This will allow all origins (for development purposes)
 app.use('/uploads', express.static('uploads'));
 
 
 
-const cors = require('cors');
-app.use(cors()); // This will allow all origins (for development purposes)
+
+
 
 // Middleware
 app.use(express.json()); // Parse JSON body
@@ -66,7 +69,7 @@ app.post('/api/products', upload.single('image'), (req, res) => {
 });
 
 // Connect to the database
-const mongoUri = process.env.MONGO_URI;
+const mongoUri = process.env.MONGO_URI || "mongodb+srv://james:0827James@mernapp.zomz5.mongodb.net/oms?retryWrites=true&w=majority&appName=MERNapp";
 const port = process.env.PORT || 3000;
 
 if (!mongoUri) {

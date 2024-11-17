@@ -20,6 +20,7 @@ const createProduct = async (req, res) => {
     // Validate request
     const { productName, price, ingredients } = req.body;
     const image = req.file ? `/uploads/${req.file.filename}` : null;
+    console.log("Image URL:", image);  // Add this to check the value
 
     // Check if all required fields are provided
     if (!productName || !price || !ingredients || !image) {
@@ -75,19 +76,29 @@ const deleteProduct = async (req, res) => {
 };
 
 // Update a product by ID
-const updateProduct = async (req, res) => {
-    const { id } = req.params;
+const updateProduct = (req, res) => {
+    // Handle the case when no file is uploaded (optional, depends on your requirements)
     const { productName, price, ingredients } = req.body;
+    const image = req.file ? req.file.path : null; // Get the file path if a new file is uploaded
 
-    try {
-        const updatedProduct = await Product.findByIdAndUpdate(id, { productName, price, ingredients }, { new: true });
-        if (!updatedProduct) {
-            return res.status(404).json({ error: 'Product not found' });
-        }
-        res.status(200).json(updatedProduct);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+    if (!productName || !price || !ingredients) {
+        return res.status(400).json({ error: "All fields are required." });
     }
+
+    // Your logic to update the product in the database
+    // Assume you have a Product model and you're using Mongoose
+    Product.findByIdAndUpdate(req.params.id, {
+        productName,
+        price,
+        ingredients,
+        image
+    }, { new: true })
+    .then(updatedProduct => {
+        res.json(updatedProduct); // Send the updated product as the response
+    })
+    .catch(error => {
+        res.status(500).json({ error: "Error updating product" });
+    });
 };
 
 module.exports = {
