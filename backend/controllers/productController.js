@@ -1,5 +1,5 @@
+// Inside productController.js
 const Product = require('../models/productModel'); // Ensure the path is correct
-
 const multer = require('multer');
 const path = require('path');
 
@@ -19,8 +19,7 @@ const upload = multer({ storage: storage });
 const createProduct = async (req, res) => {
     // Validate request
     const { productName, price, ingredients } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : null;
-    console.log("Image URL:", image);  // Add this to check the value
+    const image = req.file ? `/uploads/${req.file.filename}` : null; // Handle the uploaded image
 
     // Check if all required fields are provided
     if (!productName || !price || !ingredients || !image) {
@@ -76,29 +75,30 @@ const deleteProduct = async (req, res) => {
 };
 
 // Update a product by ID
-const updateProduct = (req, res) => {
-    // Handle the case when no file is uploaded (optional, depends on your requirements)
+const updateProduct = async (req, res) => {
     const { productName, price, ingredients } = req.body;
-    const image = req.file ? req.file.path : null; // Get the file path if a new file is uploaded
+    const image = req.file ? `/uploads/${req.file.filename}` : null; // Handle the uploaded image
 
     if (!productName || !price || !ingredients) {
         return res.status(400).json({ error: "All fields are required." });
     }
 
-    // Your logic to update the product in the database
-    // Assume you have a Product model and you're using Mongoose
-    Product.findByIdAndUpdate(req.params.id, {
-        productName,
-        price,
-        ingredients,
-        image
-    }, { new: true })
-    .then(updatedProduct => {
+    try {
+        const updatedProduct = await Product.findByIdAndUpdate(req.params.id, {
+            productName,
+            price,
+            ingredients,
+            image
+        }, { new: true });
+
+        if (!updatedProduct) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+
         res.json(updatedProduct); // Send the updated product as the response
-    })
-    .catch(error => {
+    } catch (error) {
         res.status(500).json({ error: "Error updating product" });
-    });
+    }
 };
 
 module.exports = {

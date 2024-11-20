@@ -11,7 +11,9 @@ const {
 const router = express.Router();
 
 // Use multer's upload middleware for the POST route
-router.post('/', upload.single('image'), createProduct);  // Single file upload
+
+router.post('/', upload.single('image'), createProduct); // POST to create product
+router.patch('/:id', upload.single('image'), updateProduct);  // Single file upload
 
 router.get('/', getProducts);
 
