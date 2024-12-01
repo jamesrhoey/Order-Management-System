@@ -83,48 +83,91 @@
 
     <!-- Add Order Modal -->
     <div class="modal fade" id="addOrderModal" tabindex="-1" aria-labelledby="addOrderModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="addOrderModalLabel">Add Order</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header" style="background-color: #1a1a1a; color: white;">
+                    <h5 class="modal-title" id="addOrderModalLabel">
+                        <i class="fa fa-plus-circle me-2"></i>Add New Order
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <form id="addOrderForm">
-                        <div class="mb-3">
-                            <label for="customerName" class="form-label">Customer Name</label>
-                            <input type="text" class="form-control" id="customerName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="deliveryAddress" class="form-label">Delivery Address</label>
-                            <input type="text" class="form-control" id="deliveryAddress" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="contactNumber" class="form-label">Contact Number</label>
-                            <input type="text" class="form-control" id="contactNumber" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="productSelect" class="form-label">Select Products</label>
-                            <div>
-                                <label><input type="checkbox" class="product-checkbox" value="Adobowow"> Adobowow</label><br>
-                                <label><input type="checkbox" class="product-checkbox" value="Sinugnog"> Sinugnog</label><br>
-                                <label><input type="checkbox" class="product-checkbox" value="Kalebayor"> Kalebayor</label><br>
-                                <label><input type="checkbox" class="product-checkbox" value="Sinalsale"> Sinalsale</label><br>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="customerName" class="form-label fw-bold">
+                                    <i class="fa fa-user me-2"></i>Customer Name
+                                </label>
+                                <input type="text" class="form-control shadow-sm" id="customerName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="contactNumber" class="form-label fw-bold">
+                                    <i class="fa fa-phone me-2"></i>Contact Number
+                                </label>
+                                <input type="text" class="form-control shadow-sm" id="contactNumber" required>
                             </div>
                         </div>
+                        
                         <div class="mb-3">
-                            <label for="notes" class="form-label">Notes</label>
-                            <textarea class="form-control" id="notes" rows="2"></textarea>
+                            <label for="deliveryAddress" class="form-label fw-bold">
+                                <i class="fa fa-location-dot me-2"></i>Delivery Address
+                            </label>
+                            <input type="text" class="form-control shadow-sm" id="deliveryAddress" required>
                         </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fa fa-cart-shopping me-2"></i>Select Products
+                            </label>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-check custom-checkbox">
+                                        <input type="checkbox" class="form-check-input product-checkbox" value="Adobowow" id="adobo">
+                                        <label class="form-check-label" for="adobo">Adobowow</label>
+                                    </div>
+                                    <div class="form-check custom-checkbox">
+                                        <input type="checkbox" class="form-check-input product-checkbox" value="Sinugnog" id="sinugnog">
+                                        <label class="form-check-label" for="sinugnog">Sinugnog</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check custom-checkbox">
+                                        <input type="checkbox" class="form-check-input product-checkbox" value="Kalebayor" id="kalebayor">
+                                        <label class="form-check-label" for="kalebayor">Kalebayor</label>
+                                    </div>
+                                    <div class="form-check custom-checkbox">
+                                        <input type="checkbox" class="form-check-input product-checkbox" value="Sinalsale" id="sinalsale">
+                                        <label class="form-check-label" for="sinalsale">Sinalsale</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="mb-3">
-                            <label for="paymentMethod" class="form-label">Payment Method</label>
-                            <select class="form-control" id="paymentMethod" required>
+                            <label for="notes" class="form-label fw-bold">
+                                <i class="fa fa-note-sticky me-2"></i>Notes
+                            </label>
+                            <textarea class="form-control shadow-sm" id="notes" rows="2"></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="paymentMethod" class="form-label fw-bold">
+                                <i class="fa fa-credit-card me-2"></i>Payment Method
+                            </label>
+                            <select class="form-select shadow-sm" id="paymentMethod" required>
+                                <option value="" selected disabled>Select payment method</option>
                                 <option value="Cash">Cash</option>
                                 <option value="Gcash">Gcash</option>
                                 <option value="Bank Transfer">Bank Transfer</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary">Add Order</button>
+
+                        <div class="text-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-save me-2"></i>Save Order
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
