@@ -1,111 +1,85 @@
-// Inside productController.js
-const Product = require('../models/productModel'); // Ensure the path is correct
-const multer = require('multer');
-const path = require('path');
+const Product = require('../models/productModel');
 
-// Configure multer for image uploads
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');  // Store uploaded images in the 'uploads' folder
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));  // Add timestamp to filenames to avoid collisions
-    }
-});
-
-const upload = multer({ storage: storage });
-
-// Create product
-const createProduct = async (req, res) => {
-    // Validate request
-    const { productName, price, ingredients } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : null; // Handle the uploaded image
-
-    // Check if all required fields are provided
-    if (!productName || !price || !ingredients || !image) {
-        return res.status(400).json({ error: 'Product name, price, ingredients, and image are required.' });
-    }
-
+// Create a new product
+exports.createProduct = async (req, res) => {
     try {
-        // Create new product
-        const product = new Product({ productName, price, ingredients, image });
+        const { productName, price, ingredients, image } = req.body;
+        
+        // Get the latest productId
+        const latestProduct = await Product.findOne().sort('-productId');
+        const newProductId = latestProduct ? latestProduct.productId + 1 : 1;
+
+        const product = new Product({
+            productId: newProductId,
+            productName,
+            price,
+            ingredients: ingredients.split(',').map(item => item.trim()),
+            image
+        });
+
         await product.save();
-        res.status(200).json(product);
+        res.status(201).json(product);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(400).json({ message: error.message });
     }
 };
 
 // Get all products
-const getProducts = async (req, res) => {
+exports.getProducts = async (req, res) => {
     try {
         const products = await Product.find();
-        res.status(200).json(products);
+        res.json(products);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
 
-// Get single product by ID
-const getProduct = async (req, res) => {
-    const { id } = req.params;
+// Get product by ID
+exports.getProductById = async (req, res) => {
     try {
-        const product = await Product.findById(id);
+        const product = await Product.findOne({ productId: req.params.id });
         if (!product) {
-            return res.status(404).json({ error: 'Product not found' });
+            return res.status(404).json({ message: 'Product not found' });
         }
-        res.status(200).json(product);
+        res.json(product);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
 
-// Delete a product by ID
-const deleteProduct = async (req, res) => {
-    const { id } = req.params;
+// Update product
+exports.updateProduct = async (req, res) => {
     try {
-        const deletedProduct = await Product.findByIdAndDelete(id);
-        if (!deletedProduct) {
-            return res.status(404).json({ error: 'Product not found' });
+        const { productName, price, ingredients, image } = req.body;
+        const product = await Product.findOne({ productId: req.params.id });
+        
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
         }
-        res.status(200).json({ message: 'Product deleted successfully' });
+
+        product.productName = productName || product.productName;
+        product.price = price || product.price;
+        if (ingredients) {
+            product.ingredients = ingredients.split(',').map(item => item.trim());
+        }
+        product.image = image || product.image;
+
+        await product.save();
+        res.json(product);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(400).json({ message: error.message });
     }
 };
 
-// Update a product by ID
-const updateProduct = async (req, res) => {
-    const { productName, price, ingredients } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : null; // Handle the uploaded image
-
-    if (!productName || !price || !ingredients) {
-        return res.status(400).json({ error: "All fields are required." });
-    }
-
+// Delete product
+exports.deleteProduct = async (req, res) => {
     try {
-        const updatedProduct = await Product.findByIdAndUpdate(req.params.id, {
-            productName,
-            price,
-            ingredients,
-            image
-        }, { new: true });
-
-        if (!updatedProduct) {
-            return res.status(404).json({ error: 'Product not found' });
+        const product = await Product.findOneAndDelete({ productId: req.params.id });
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
         }
-
-        res.json(updatedProduct); // Send the updated product as the response
+        res.json({ message: 'Product deleted successfully' });
     } catch (error) {
-        res.status(500).json({ error: "Error updating product" });
+        res.status(500).json({ message: error.message });
     }
-};
-
-module.exports = {
-    createProduct,
-    getProducts,
-    getProduct,
-    deleteProduct,
-    updateProduct,
-    upload // Export multer instance for use in routes
 };

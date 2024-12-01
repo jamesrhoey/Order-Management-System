@@ -1,49 +1,67 @@
 // Inside server.js
 const express = require('express');
 const mongoose = require('mongoose');
-const multer = require('multer');
 const cors = require('cors');
-const productRoutes = require('./routes/product');
-const path = require('path');
+const dotenv = require('dotenv');
+const productRoutes = require('./routes/productRoutes');
 
-// Create Express app
+// Load environment variables
+dotenv.config();
+
+// Check if MongoDB URI is defined
+if (!process.env.MONGODB_URI) {
+    console.error('MongoDB URI is not defined in environment variables');
+    process.exit(1);
+}
+
 const app = express();
 
-// CORS
-app.use('/api/products', cors());  // Allow cross-origin requests for products
-app.use('/uploads', express.static('uploads'));  // Serve uploaded files from 'uploads'
-
 // Middleware
-app.use(express.json()); // Parse JSON body
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded data
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Configure multer storage for image uploads
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');  // Store uploaded images in the 'uploads' folder
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));  // Add timestamp to filenames to avoid collisions
+// Database connection with retry logic
+const connectDB = async () => {
+    try {
+        await mongoose.connect(process.env.MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+        console.log('Connected to MongoDB successfully');
+    } catch (error) {
+        console.error('MongoDB connection error:', error);
+        // Retry connection after 5 seconds
+        console.log('Retrying connection in 5 seconds...');
+        setTimeout(connectDB, 5000);
     }
+};
+
+// Initial database connection
+connectDB();
+
+// Monitor database connection
+mongoose.connection.on('disconnected', () => {
+    console.log('MongoDB disconnected! Attempting to reconnect...');
+    connectDB();
 });
 
-const upload = multer({ storage: storage });
-
 // Routes
-app.use('/api/products', productRoutes); // Use the product routes
+app.use('/api', productRoutes);
 
-// Connect to the database
-const mongoUri = process.env.MONGO_URI || "mongodb+srv://james:0827James@mernapp.zomz5.mongodb.net/oms?retryWrites=true&w=majority&appName=MERNapp";
-const port = process.env.PORT || 4000;
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: 'Something went wrong!' });
+});
 
-mongoose
-    .connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => {
-        console.log('Connected to MongoDB');
-        app.listen(port, () => {
-            console.log(`Server is running on port ${port}`);
-        });
-    })
-    .catch((error) => {
-        console.error('Failed to connect to MongoDB:', error.message);
-    });
+// 404 handler
+app.use((req, res) => {
+    res.status(404).json({ message: 'Route not found' });
+});
+
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
