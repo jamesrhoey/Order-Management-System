@@ -7,9 +7,7 @@ async function fetchProducts() {
         const response = await fetch(`${API_URL}/products`, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
-                // Add CORS headers
-                'Access-Control-Allow-Origin': '*'
+                'Content-Type': 'application/json'
             }
         });
         
@@ -21,61 +19,86 @@ async function fetchProducts() {
         displayProducts(data);
     } catch (error) {
         console.error('Error fetching products:', error);
-        // Show user-friendly error message
         Swal.fire({
             icon: 'error',
             title: 'Connection Error',
             text: 'Unable to connect to the server. Please make sure the server is running.',
-            footer: 'Check if backend server is started on port 5000'
+            footer: 'Check if backend server is started on port 4000'
         });
     }
 }
 
 // Add new product
-document.getElementById('addProductForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+document.addEventListener('DOMContentLoaded', function() {
+    const addProductForm = document.getElementById('addProductForm');
     
-    const formData = {
-        productName: document.getElementById('productName').value,
-        price: Number(document.getElementById('productPrice').value),
-        ingredients: document.getElementById('productIngredients').value,
-        image: document.getElementById('productImage').value // Note: You'll need additional handling for file uploads
-    };
+    if (addProductForm) {
+        addProductForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Get form elements
+            const productNameInput = document.getElementById('productName');
+            const productPriceInput = document.getElementById('productPrice');
+            const productIngredientsInput = document.getElementById('productIngredients');
 
-    try {
-        const response = await fetch(`${API_URL}/products`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            },
-            body: JSON.stringify(formData)
-        });
+            // Validate that all required elements exist
+            if (!productNameInput || !productPriceInput || !productIngredientsInput) {
+                console.error('Required form elements not found');
+                return;
+            }
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+            const formData = {
+                productName: productNameInput.value,
+                price: Number(productPriceInput.value),
+                ingredients: productIngredientsInput.value
+            };
 
-        const result = await response.json();
-        
-        Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: 'Product added successfully'
-        });
-        
-        // Reset form and refresh products
-        document.getElementById('addProductForm').reset();
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
-        modal.hide();
-        await fetchProducts();
-        
-    } catch (error) {
-        console.error('Error adding product:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Failed to add product. Please try again.'
+            try {
+                console.log('Sending request to:', `${API_URL}/products`);
+                console.log('Request payload:', formData);
+                
+                const response = await fetch(`${API_URL}/products`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server response:', errorText);
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                }
+
+                const result = await response.json();
+                console.log('Success response:', result);
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Product added successfully'
+                });
+                
+                // Reset form and close modal
+                addProductForm.reset();
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
+                if (modal) {
+                    modal.hide();
+                }
+                
+                // Refresh the products list
+                await fetchProducts();
+                
+            } catch (error) {
+                console.error('Error adding product:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to add product. Please try again.'
+                });
+            }
         });
     }
 });
@@ -97,8 +120,7 @@ async function deleteProduct(productId) {
             const response = await fetch(`${API_URL}/products/${productId}`, {
                 method: 'DELETE',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
+                    'Content-Type': 'application/json'
                 }
             });
 

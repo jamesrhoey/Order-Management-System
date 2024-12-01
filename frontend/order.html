@@ -6,6 +6,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" href="/frontend/assets/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <title>Home</title>
 </head>
 
@@ -119,27 +120,8 @@
                             <label class="form-label fw-bold">
                                 <i class="fa fa-cart-shopping me-2"></i>Select Products
                             </label>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="form-check custom-checkbox">
-                                        <input type="checkbox" class="form-check-input product-checkbox" value="Adobowow" id="adobo">
-                                        <label class="form-check-label" for="adobo">Adobowow</label>
-                                    </div>
-                                    <div class="form-check custom-checkbox">
-                                        <input type="checkbox" class="form-check-input product-checkbox" value="Sinugnog" id="sinugnog">
-                                        <label class="form-check-label" for="sinugnog">Sinugnog</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-check custom-checkbox">
-                                        <input type="checkbox" class="form-check-input product-checkbox" value="Kalebayor" id="kalebayor">
-                                        <label class="form-check-label" for="kalebayor">Kalebayor</label>
-                                    </div>
-                                    <div class="form-check custom-checkbox">
-                                        <input type="checkbox" class="form-check-input product-checkbox" value="Sinalsale" id="sinalsale">
-                                        <label class="form-check-label" for="sinalsale">Sinalsale</label>
-                                    </div>
-                                </div>
+                            <div class="row g-3" id="productCheckboxContainer">
+                                <!-- Products will be populated here dynamically -->
                             </div>
                         </div>
 
@@ -227,86 +209,200 @@
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 let orderIdCounter = 1; // Keeps track of order IDs
 let editingOrderIndex = null; // Tracks the index of the order being edited
 
-// Function to load orders from localStorage and display them
-function loadOrders() {
-    const orders = JSON.parse(localStorage.getItem("orders")) || [];
-    const userDetailsTable = document.getElementById('userDetails');
-    userDetailsTable.innerHTML = ''; // Clear existing rows
+// Function to load orders from the API and display them
+async function loadOrders() {
+    try {
+        const response = await fetch('http://localhost:4000/api/orders');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const orders = await response.json();
+        const userDetailsTable = document.getElementById('userDetails');
+        userDetailsTable.innerHTML = ''; // Clear existing rows
 
-    orders.forEach((order, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${order.orderId}</td>
-            <td>${order.customerName}</td>
-            <td>${order.orderDate}</td>
-            <td>${order.orderTime}</td>
-            <td>${order.paymentMethod}</td>
-            <td>${order.orderDetails}</td>
-            <td><span class="pending">${order.status}</span></td>
-            <td>
-                <button class="btn btn-warning btn-sm" onclick="editOrder(${index})">
-                    <i class="fa fa-edit"></i> Edit
-                </button>
-                <button class="btn btn-danger btn-sm" onclick="deleteOrder(${index})">
-                    <i class="fa fa-trash"></i> Delete
-                </button>
-            </td>
+        orders.forEach(order => {
+            // Format the order details (products)
+            const orderDetails = order.orderDetails
+                .map(detail => detail.product.productName)
+                .join(', ');
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${order._id}</td>
+                <td>${order.customerName}</td>
+                <td>${order.orderDate}</td>
+                <td>${order.orderTime}</td> 
+                <td>${order.paymentMethod}</td>
+                <td>${orderDetails}</td>
+                <td><span class="badge ${getStatusBadgeClass(order.status)}">${order.status}</span></td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="editOrder('${order._id}')">
+                        <i class="fa fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteOrder('${order._id}')">
+                        <i class="fa fa-trash"></i> Delete
+                    </button>
+                </td>
+            `;
+            userDetailsTable.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Error loading orders:', error);
+        const userDetailsTable = document.getElementById('userDetails');
+        userDetailsTable.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center text-danger">
+                    Failed to load orders. Please try again later.
+                    Error: ${error.message}
+                </td>
+            </tr>
         `;
-        userDetailsTable.appendChild(row);
-    });
-
-    orderIdCounter = orders.length > 0 ? orders[orders.length - 1].orderId + 1 : 1;
+    }
 }
 
-// Function to handle Add Order form submission
-document.getElementById('addOrderForm').addEventListener('submit', function (event) {
+// Helper function to get the appropriate badge class based on status
+function getStatusBadgeClass(status) {
+    switch (status.toLowerCase()) {
+        case 'pending':
+            return 'bg-warning text-dark';
+        case 'completed':
+            return 'bg-success';
+        case 'cancelled':
+            return 'bg-danger';
+        default:
+            return 'bg-secondary';
+    }
+}
+
+// Update the Add Order form submission handler
+document.getElementById('addOrderForm').addEventListener('submit', async function (event) {
     event.preventDefault();
 
-    const customerName = document.getElementById('customerName').value;
-    const deliveryAddress = document.getElementById('deliveryAddress').value;
-    const contactNumber = document.getElementById('contactNumber').value;
-    const paymentMethod = document.getElementById('paymentMethod').value;
+    try {
+        const customerName = document.getElementById('customerName').value;
+        const deliveryAddress = document.getElementById('deliveryAddress').value;
+        const contactNumber = document.getElementById('contactNumber').value;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const notes = document.getElementById('notes').value;
 
-    const selectedProducts = Array.from(document.querySelectorAll('.product-checkbox:checked'))
-        .map(checkbox => checkbox.value);
+        // Get selected products with their MongoDB IDs
+        const selectedProducts = Array.from(document.querySelectorAll('.product-checkbox:checked'))
+            .map(checkbox => ({
+                productId: checkbox.value,  // This will now be the MongoDB _id
+                productName: checkbox.dataset.name
+            }));
 
     if (selectedProducts.length === 0) {
         alert("Please select at least one product.");
         return;
     }
 
-    const orderDetails = selectedProducts.join(", ");
-    const orderDate = new Date().toISOString().split('T')[0]; // Current date
-    const orderTime = new Date().toTimeString().split(' ')[0]; // Current time
-    const status = 'Pending'; // Default status
+        const orderData = {
+            customerName,
+            deliveryAddress,
+            contactNumber,
+            paymentMethod,
+            products: selectedProducts.map(p => p.productId), // Send only the MongoDB IDs
+            notes,
+            orderDate: new Date().toISOString().split('T')[0],
+            orderTime: new Date().toTimeString().split(' ')[0],
+            status: 'Pending'
+        };
 
-    const newOrder = {
-        orderId: orderIdCounter,
-        customerName,
-        deliveryAddress,
-        contactNumber,
-        paymentMethod,
-        orderDetails,
-        orderDate,
-        orderTime,
-        status
-    };
+        console.log('Sending order data:', orderData); // Debug log
 
-    let orders = JSON.parse(localStorage.getItem("orders")) || [];
-    orders.push(newOrder);
-    orderIdCounter++;
+        const response = await fetch('http://localhost:4000/api/orders', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(orderData)
+        });
 
-    localStorage.setItem("orders", JSON.stringify(orders));
-    loadOrders();
+        const responseData = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(`Server Error: ${responseData.message || 'Unknown error'}`);
+        }
 
-    const addModal = bootstrap.Modal.getInstance(document.getElementById('addOrderModal'));
-    addModal.hide();
-    document.getElementById('addOrderForm').reset();
+        // Success handling
+        const addModal = bootstrap.Modal.getInstance(document.getElementById('addOrderModal'));
+        addModal.hide();
+        this.reset();
+        
+        // Call loadOrders to refresh the table
+        await loadOrders();
+        
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Order added successfully!'
+        });
+
+    } catch (error) {
+        console.error('Full error details:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error Adding Order',
+            text: error.message
+        });
+    }
 });
+
+// Update the loadProducts function
+async function loadProducts() {
+    try {
+        const response = await fetch('http://localhost:4000/api/products');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const products = await response.json();
+        
+        const container = document.getElementById('productCheckboxContainer');
+        container.innerHTML = '';
+        
+        products.forEach((product, index) => {
+            if (index % 2 === 0) {
+                container.innerHTML += `<div class="col-md-6">`;
+            }
+            
+            const productHtml = `
+                <div class="form-check custom-checkbox">
+                    <input type="checkbox" class="form-check-input product-checkbox" 
+                           value="${product._id}" 
+                           data-name="${product.productName}"
+                           id="product_${product._id}">
+                    <label class="form-check-label" for="product_${product._id}">
+                        ${product.productName} - $${product.price}
+                    </label>
+                </div>
+            `;
+            
+            container.lastElementChild.innerHTML += productHtml;
+            
+            if (index % 2 === 1 || index === products.length - 1) {
+                container.innerHTML += `</div>`;
+            }
+        });
+    } catch (error) {
+        console.error('Error loading products:', error);
+        const container = document.getElementById('productCheckboxContainer');
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                Failed to load products. Please try again later.
+                Error: ${error.message}
+            </div>
+        `;
+    }
+}
 
 // Function to hndle Edit Ordera form submission
 document.getElementById('editOrderForm').addEventListener('submit', function (event) {
@@ -374,8 +470,17 @@ function deleteOrder(index) {
     loadOrders();
 }
 
-// Load orders on page load
-window.onload = loadOrders;
+// Update the window.onload function to also load products
+window.onload = function() {
+    loadOrders();
+    loadProducts();
+};
+
+// Also load products when the add order modal is shown
+document.getElementById('addOrderModal').addEventListener('show.bs.modal', loadProducts);
+
+// Load orders when page loads
+document.addEventListener('DOMContentLoaded', loadOrders);
 
     </script>
 </body>
