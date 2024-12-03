@@ -1,6 +1,7 @@
 const Order = require('../models/orderModel');
 const Product = require('../models/productModel');
 const mongoose = require('mongoose');
+const transactionController = require('./transactionController');
 
 const orderController = {
     // Create a new order
@@ -80,9 +81,47 @@ const orderController = {
 
             const savedOrder = await newOrder.save();
             
-            res.status(201).json({ 
+            // If order status is Completed, create transaction immediately
+            let transaction = null;
+            if (savedOrder.status === 'Completed') {
+                // Populate the order details to get product names
+                const populatedOrder = await Order.findById(savedOrder._id)
+                    .populate('orderDetails.product', 'productName');
+                
+                const productNames = populatedOrder.orderDetails
+                    .map(detail => detail.product.productName)
+                    .join(', ');
+
+                transaction = await transactionController.createTransactionFromOrder(
+                    savedOrder,
+                    paymentMethod,
+                    paymentDetails || {}, // Use empty object if paymentDetails not provided
+                    {
+                        notes: notes,
+                        deliveryAddress: deliveryAddress,
+                        contactNumber: contactNumber,
+                        products: productNames
+                    }
+                );
+
+                // Update product inventory
+                for (const detail of populatedOrder.orderDetails) {
+                    await Product.findByIdAndUpdate(
+                        detail.product._id,
+                        {
+                            $inc: { 
+                                stockQuantity: -detail.quantity,
+                                soldQuantity: detail.quantity 
+                            }
+                        }
+                    );
+                }
+            }
+
+            res.status(201).json({
                 message: 'Order created successfully',
-                order: savedOrder 
+                order: savedOrder,
+                transaction: transaction
             });
         } catch (error) {
             console.error('Order creation error:', error);
@@ -93,15 +132,31 @@ const orderController = {
         }
     },
 
-    // Get all orders
+    // Get all orders (with optional status filter)
     getAllOrders: async (req, res) => {
         try {
-            const orders = await Order.find()
+            const { status } = req.query;
+            const query = status ? { status } : {};
+            
+            const orders = await Order.find(query)
                 .populate('orderDetails.product', 'productName price')
                 .sort({ createdAt: -1 }); // Most recent orders first
             res.json(orders);
         } catch (error) {
             console.error('Error fetching orders:', error);
+            res.status(500).json({ message: error.message });
+        }
+    },
+
+    // Get completed orders
+    getCompletedOrders: async (req, res) => {
+        try {
+            const orders = await Order.find({ status: 'Completed' })
+                .populate('orderDetails.product', 'productName price')
+                .sort({ createdAt: -1 });
+            res.json(orders);
+        } catch (error) {
+            console.error('Error fetching completed orders:', error);
             res.status(500).json({ message: error.message });
         }
     },
@@ -128,16 +183,56 @@ const orderController = {
                 req.params.id,
                 { status },
                 { new: true }
-            );
+            ).populate('orderDetails.product', 'productName');
+
             if (!order) {
                 return res.status(404).json({ message: 'Order not found' });
             }
+
+            // If status is completed, create a transaction
+            if (status === 'Completed') {
+                // Get product names for the transaction
+                const productNames = order.orderDetails
+                    .map(detail => detail.product.productName)
+                    .join(', ');
+
+                // Create transaction
+                await transactionController.createTransactionFromOrder(
+                    order,
+                    order.paymentMethod,
+                    {}, // paymentDetails can be empty for now
+                    {
+                        notes: order.notes,
+                        deliveryAddress: order.deliveryAddress,
+                        contactNumber: order.contactNumber,
+                        products: productNames
+                    }
+                );
+
+                // Update product inventory
+                for (const detail of order.orderDetails) {
+                    await Product.findByIdAndUpdate(
+                        detail.product._id,
+                        {
+                            $inc: { 
+                                stockQuantity: -detail.quantity,
+                                soldQuantity: detail.quantity 
+                            }
+                        }
+                    );
+                }
+            }
+
             res.json({ 
                 message: 'Order status updated successfully',
                 order 
             });
         } catch (error) {
-            res.status(500).json({ message: error.message });
+            console.error('Error updating order status:', error);
+            res.status(500).json({ 
+                message: 'Error updating order status',
+                error: error.message 
+            });
         }
     },
 
@@ -152,6 +247,25 @@ const orderController = {
             res.json(orders);
         } catch (error) {
             res.status(500).json({ message: error.message });
+        }
+    },
+
+    // Delete order by ID
+    deleteOrder: async (req, res) => {
+        try {
+            const order = await Order.findByIdAndDelete(req.params.id);
+            if (!order) {
+                return res.status(404).json({ message: 'Order not found' });
+            }
+            res.json({ 
+                message: 'Order deleted successfully',
+                deletedOrder: order 
+            });
+        } catch (error) {
+            res.status(500).json({ 
+                message: 'Error deleting order',
+                error: error.message 
+            });
         }
     }
 };

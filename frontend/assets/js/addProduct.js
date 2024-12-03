@@ -160,7 +160,7 @@ function displayProducts(products) {
 
     tbody.innerHTML = products.map(product => `
         <tr>
-            <td>${product.productId}</td>
+            <td>${product._id}</td>
             <td>${product.productName}</td>
             <td>${product.price}</td>
             <td>
@@ -174,7 +174,7 @@ function displayProducts(products) {
                 </div>
             </td>
             <td>
-                <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.productId})">
+                <button class="btn btn-sm btn-danger" onclick="deleteProduct('${product._id}')">
                     Delete
                 </button>
             </td>

@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
-    productId: {
-        type: Number,
-        required: true,
-        unique: true
-    },
     productName: {
         type: String,
         required: true,
@@ -21,25 +16,17 @@ const productSchema = new mongoose.Schema({
         required: true,
         validate: {
             validator: function(v) {
-                return v && v.length > 0; // Ensures at least one ingredient
+                return v && v.length > 0;
             },
             message: 'Product must have at least one ingredient'
         }
     },
     image: {
-        type: String,  // Store the image URL or path
+        type: String,
         required: false
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
     }
 }, {
-    timestamps: true // Automatically manage createdAt and updatedAt
+    timestamps: true
 });
 
 // Add index for faster queries

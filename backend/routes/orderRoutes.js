@@ -14,6 +14,9 @@ router.get('/:id', orderController.getOrderById);
 // Update order status
 router.patch('/:id/status', orderController.updateOrderStatus);
 
+// Delete order
+router.delete('/:id', orderController.deleteOrder);
+
 // Get orders by date range
 router.get('/range/date', orderController.getOrdersByDateRange);
 

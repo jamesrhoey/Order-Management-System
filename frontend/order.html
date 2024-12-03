@@ -207,12 +207,55 @@
         </div>
     </div>
 
+    <!-- View Order Details Modal -->
+    <div class="modal fade" id="viewOrderDetailsModal" tabindex="-1" aria-labelledby="viewOrderDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #1a1a1a; color: white;">
+                    <h5 class="modal-title" id="viewOrderDetailsModalLabel">
+                        <i class="fa fa-info-circle me-2"></i>Order Details
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Products:</h6>
+                        <p id="viewOrderProducts"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Notes:</h6>
+                        <p id="viewOrderNotes"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Delivery Address:</h6>
+                        <p id="viewDeliveryAddress"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Contact Number:</h6>
+                        <p id="viewContactNumber"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 let orderIdCounter = 1; // Keeps track of order IDs
 let editingOrderIndex = null; // Tracks the index of the order being edited
+
+// Add this function before the loadOrders function
+function viewOrderDetails(orderId, products, notes, deliveryAddress, contactNumber) {
+    document.getElementById('viewOrderProducts').textContent = products;
+    document.getElementById('viewOrderNotes').textContent = notes || 'No notes provided';
+    document.getElementById('viewDeliveryAddress').textContent = deliveryAddress;
+    document.getElementById('viewContactNumber').textContent = contactNumber;
+    
+    const modal = new bootstrap.Modal(document.getElementById('viewOrderDetailsModal'));
+    modal.show();
+}
 
 // Function to load orders from the API and display them
 async function loadOrders() {
@@ -239,7 +282,12 @@ async function loadOrders() {
                 <td>${order.orderDate}</td>
                 <td>${order.orderTime}</td> 
                 <td>${order.paymentMethod}</td>
-                <td>${orderDetails}</td>
+                <td>
+                    <a href="#" class="text-primary text-decoration-none" 
+                       onclick="viewOrderDetails('${order._id}', \`${orderDetails}\`, \`${order.notes || ''}\`, \`${order.deliveryAddress}\`, \`${order.contactNumber}\`)">
+                        ${orderDetails}
+                    </a>
+                </td>
                 <td><span class="badge ${getStatusBadgeClass(order.status)}">${order.status}</span></td>
                 <td>
                     <button class="btn btn-warning btn-sm" onclick="editOrder('${order._id}')">

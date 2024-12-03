@@ -1,16 +1,12 @@
 const Product = require('../models/productModel');
+const mongoose = require('mongoose');
 
 // Create a new product
 exports.createProduct = async (req, res) => {
     try {
         const { productName, price, ingredients, image } = req.body;
         
-        // Get the latest productId
-        const latestProduct = await Product.findOne().sort('-productId');
-        const newProductId = latestProduct ? latestProduct.productId + 1 : 1;
-
         const product = new Product({
-            productId: newProductId,
             productName,
             price,
             ingredients: ingredients.split(',').map(item => item.trim()),
@@ -37,7 +33,7 @@ exports.getProducts = async (req, res) => {
 // Get product by ID
 exports.getProductById = async (req, res) => {
     try {
-        const product = await Product.findOne({ productId: req.params.id });
+        const product = await Product.findById(req.params.id);
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
@@ -51,7 +47,7 @@ exports.getProductById = async (req, res) => {
 exports.updateProduct = async (req, res) => {
     try {
         const { productName, price, ingredients, image } = req.body;
-        const product = await Product.findOne({ productId: req.params.id });
+        const product = await Product.findById(req.params.id);
         
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
@@ -74,7 +70,7 @@ exports.updateProduct = async (req, res) => {
 // Delete product
 exports.deleteProduct = async (req, res) => {
     try {
-        const product = await Product.findOneAndDelete({ productId: req.params.id });
+        const product = await Product.findByIdAndDelete(req.params.id);
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
