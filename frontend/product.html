@@ -45,6 +45,68 @@
         .product-card .card-text {
             font-size: 0.875rem; 
         }
+
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table thead th {
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table tbody tr {
+            border-bottom: 1px solid #f8f9fa;
+            transition: all 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+            transform: scale(1.001);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .wrapper {
+            background: white;
+            border: 1px solid #e9ecef;
+        }
+
+        /* Action buttons styling */
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            border-radius: 0.2rem;
+            margin: 0 2px;
+            transition: all 0.2s;
+        }
+
+        .btn-sm:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: #fff;
+        }
+
+        /* See More button styling */
+        .btn-text {
+            text-decoration: none;
+            color: #0d6efd;
+            transition: all 0.2s;
+            margin-left: 0.5rem;
+        }
+
+        .btn-text:hover {
+            color: #0a58ca;
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -101,18 +163,18 @@
                         </button>
                     </div>
                     <div class="row" id="product">
-                        <div class="table-responsive mt-4 p-4 wrapper rounded-3">
-                            <table class="table table-hover">
-                                <thead class="bg-light text-center">
-                                    <tr class="align-middle">
-                                        <th>ProductId</th>
-                                        <th>Product Name</th>
-                                        <th>Price</th>
-                                        <th>Ingredients</th>
-                                        <th>Action</th>
+                        <div class="table-responsive mt-4 p-4 wrapper rounded-3 shadow-sm">
+                            <table class="table table-hover align-middle mb-0 bg-white">
+                                <thead>
+                                    <tr class="text-center" style="background-color: #f8f9fa;">
+                                        <th class="py-3">ProductId</th>
+                                        <th class="py-3">Product Name</th>
+                                        <th class="py-3">Price</th>
+                                        <th class="py-3">Ingredients</th>
+                                        <th class="py-3">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody class="table-hover text-center" id="userDetails">
+                                <tbody class="text-center" id="userDetails">
                                     <tr>
                                         <td>1</td>
                                         <td>Chicken Curry</td>
@@ -142,7 +204,7 @@
                                         </td>
                                     </tr>
                                 </tbody>
-                                
+                            </table>
                         </div>
                         <div class="modal fade" id="ingredientsModal" tabindex="-1" aria-labelledby="ingredientsModalLabel" aria-hidden="true">
                             <div class="modal-dialog">

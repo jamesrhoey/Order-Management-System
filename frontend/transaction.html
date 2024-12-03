@@ -54,7 +54,7 @@
             <div class="col py-3">
                 <div class="container">
                     <h2 class="mb-4 text-light">Transaction History</h2>
-                    <div class="table-responsive">
+                    <div class="table-responsive mt-4 p-4 wrapper rounded-3 shadow-sm">
                         <table class="table table-striped">
                             <thead>
                                 <tr>
@@ -69,16 +69,20 @@
                                 <!-- Transaction rows will be dynamically added here -->
                             </tbody>
                         </table>
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <div class="dataTables_info" id="datatable_info" role="status" aria-live="polite">
+                                Showing <span id="startEntry">1</span> to <span id="endEntry">10</span> of <span id="totalEntries">0</span> entries
+                            </div>
+                            <div class="d-flex justify-content-center mt-3">
+                                <div id="paginationControls"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="assets/js/transaction.js"></script>
 
     <!-- View Transaction Details Modal -->
     <div class="modal fade" id="viewTransactionDetailsModal" tabindex="-1" aria-labelledby="viewTransactionDetailsModalLabel" aria-hidden="true">
@@ -92,33 +96,39 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <h6 class="fw-bold">Products:</h6>
+                        <h6 class="fw-bold"><i class="fa fa-cart-shopping me-2"></i>Products:</h6>
                         <p id="viewTransactionItems"></p>
                     </div>
                     <div class="mb-3">
-                        <h6 class="fw-bold">Total Amount:</h6>
-                        <p id="viewTotalAmount"></p>
+                        <h6 class="fw-bold"><i class="fa fa-money-bill me-2"></i>Total Amount:</h6>
+                        <p id="viewTotalAmount" class="text-success fw-bold"></p>
                     </div>
                     <div class="mb-3">
-                        <h6 class="fw-bold">Payment Method:</h6>
+                        <h6 class="fw-bold"><i class="fa fa-credit-card me-2"></i>Payment Method:</h6>
                         <p id="viewPaymentMethod"></p>
                     </div>
                     <div class="mb-3">
-                        <h6 class="fw-bold">Delivery Address:</h6>
+                        <h6 class="fw-bold"><i class="fa fa-location-dot me-2"></i>Delivery Address:</h6>
                         <p id="viewDeliveryAddress"></p>
                     </div>
                     <div class="mb-3">
-                        <h6 class="fw-bold">Contact Number:</h6>
+                        <h6 class="fw-bold"><i class="fa fa-phone me-2"></i>Contact Number:</h6>
                         <p id="viewContactNumber"></p>
                     </div>
                     <div class="mb-3">
-                        <h6 class="fw-bold">Notes:</h6>
+                        <h6 class="fw-bold"><i class="fa fa-note-sticky me-2"></i>Notes:</h6>
                         <p id="viewNotes"></p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/js/transaction.js"></script>
 </body>
 
 </html>

@@ -8,6 +8,84 @@
     <link rel="stylesheet" href="/frontend/assets/css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <title>Home</title>
+    <style>
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table thead th {
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table tbody tr {
+            border-bottom: 1px solid #f8f9fa;
+            transition: all 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+            transform: scale(1.001);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .wrapper {
+            background: white;
+            border: 1px solid #e9ecef;
+        }
+
+        .badge {
+            padding: 0.5em 1em;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* Status badge styles */
+        .badge.bg-warning {
+            background-color: #fff3cd !important;
+            color: #856404 !important;
+        }
+
+        .badge.bg-success {
+            background-color: #d4edda !important;
+            color: #155724 !important;
+        }
+
+        .badge.bg-danger {
+            background-color: #f8d7da !important;
+            color: #721c24 !important;
+        }
+
+        /* Action buttons styling */
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            border-radius: 0.2rem;
+            margin: 0 2px;
+            transition: all 0.2s;
+        }
+
+        .btn-sm:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #000;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: #fff;
+        }
+    </style>
 </head>
 
 <body>
@@ -59,21 +137,21 @@
                 <button class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#addOrderModal">Add Order</button>
 
                 <!-- Order Table -->
-                <div class="table-responsive mt-4 p-4 wrapper rounded-3">
-                    <table class="table table-hover">
-                        <thead class="bg-light text-center">
-                            <tr class="align-middle">
-                                <th>OrderId</th>
-                                <th>Customer Name</th>
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Payment Method</th>
-                                <th>Order Details</th>
-                                <th>Status</th>
-                                <th>Action</th>
+                <div class="table-responsive mt-4 p-4 wrapper rounded-3 shadow-sm">
+                    <table class="table table-hover align-middle mb-0 bg-white">
+                        <thead>
+                            <tr class="text-center" style="background-color: #f8f9fa;">
+                                <th class="py-3">OrderId</th>
+                                <th class="py-3">Customer Name</th>
+                                <th class="py-3">Date</th>
+                                <th class="py-3">Time</th>
+                                <th class="py-3">Payment Method</th>
+                                <th class="py-3">Order Details</th>
+                                <th class="py-3">Status</th>
+                                <th class="py-3">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="table-hover text-center" id="userDetails">
+                        <tbody class="text-center" id="userDetails">
                             <!-- Orders will be populated here dynamically -->
                         </tbody>
                     </table>
@@ -270,31 +348,36 @@ async function loadOrders() {
         userDetailsTable.innerHTML = ''; // Clear existing rows
 
         orders.forEach(order => {
-            // Format the order details (products)
-            const orderDetails = order.orderDetails
-                .map(detail => detail.product.productName)
+            // Safely format the order details (products)
+            const orderDetails = (order.orderDetails || [])
+                .map(detail => {
+                    // Safely access product name with fallback
+                    const productName = detail.product ? detail.product.productName : 'Unknown Product';
+                    return productName;
+                })
+                .filter(name => name) // Remove any undefined/null values
                 .join(', ');
 
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${order._id}</td>
-                <td>${order.customerName}</td>
-                <td>${order.orderDate}</td>
-                <td>${order.orderTime}</td> 
-                <td>${order.paymentMethod}</td>
+                <td>${order.customerName || 'N/A'}</td>
+                <td>${order.orderDate || 'N/A'}</td>
+                <td>${order.orderTime || 'N/A'}</td> 
+                <td>${order.paymentMethod || 'N/A'}</td>
                 <td>
                     <a href="#" class="text-primary text-decoration-none" 
-                       onclick="viewOrderDetails('${order._id}', \`${orderDetails}\`, \`${order.notes || ''}\`, \`${order.deliveryAddress}\`, \`${order.contactNumber}\`)">
-                        ${orderDetails}
+                       onclick="viewOrderDetails('${order._id}', \`${orderDetails}\`, \`${order.notes || ''}\`, \`${order.deliveryAddress || 'N/A'}\`, \`${order.contactNumber || 'N/A'}\`)">
+                        ${orderDetails || 'No products'}
                     </a>
                 </td>
-                <td><span class="badge ${getStatusBadgeClass(order.status)}">${order.status}</span></td>
+                <td><span class="badge ${getStatusBadgeClass(order.status)}">${order.status || 'Pending'}</span></td>
                 <td>
                     <button class="btn btn-warning btn-sm" onclick="editOrder('${order._id}')">
-                        <i class="fa fa-edit"></i> Edit
+                        <i class="fa fa-edit"></i>
                     </button>
                     <button class="btn btn-danger btn-sm" onclick="deleteOrder('${order._id}')">
-                        <i class="fa fa-trash"></i> Delete
+                        <i class="fa fa-trash"></i>
                     </button>
                 </td>
             `;
@@ -316,6 +399,8 @@ async function loadOrders() {
 
 // Helper function to get the appropriate badge class based on status
 function getStatusBadgeClass(status) {
+    if (!status) return 'bg-secondary'; // Default case for null/undefined status
+    
     switch (status.toLowerCase()) {
         case 'pending':
             return 'bg-warning text-dark';
@@ -510,12 +595,99 @@ function editOrder(index) {
     editModal.show();
 }
 
-// Function to delete an order
-function deleteOrder(index) {
-    const orders = JSON.parse(localStorage.getItem("orders")) || [];
-    orders.splice(index, 1);
-    localStorage.setItem("orders", JSON.stringify(orders));
-    loadOrders();
+// Update the deleteOrder function
+async function deleteOrder(orderId) {
+    try {
+        // Show confirmation dialog
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+            const response = await fetch(`http://localhost:4000/api/orders/${orderId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete order');
+            }
+
+            await loadOrders(); // Refresh the table
+
+            Swal.fire(
+                'Deleted!',
+                'Order has been deleted.',
+                'success'
+            );
+        }
+    } catch (error) {
+        console.error('Error deleting order:', error);
+        Swal.fire(
+            'Error!',
+            'Failed to delete order.',
+            'error'
+        );
+    }
+}
+
+// Add new function to edit order status
+async function editOrder(orderId) {
+    try {
+        const { value: status } = await Swal.fire({
+            title: 'Update Order Status',
+            input: 'select',
+            inputOptions: {
+                'Pending': 'Pending',
+                'Completed': 'Completed',
+                'Cancelled': 'Cancelled'
+            },
+            inputPlaceholder: 'Select status',
+            showCancelButton: true,
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Please select a status!';
+                }
+            }
+        });
+
+        if (status) {
+            const response = await fetch(`http://localhost:4000/api/orders/${orderId}/status`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update status');
+            }
+
+            await loadOrders(); // Refresh the table
+
+            Swal.fire(
+                'Updated!',
+                'Order status has been updated.',
+                'success'
+            );
+        }
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        Swal.fire(
+            'Error!',
+            'Failed to update order status.',
+            'error'
+        );
+    }
 }
 
 // Update the window.onload function to also load products
