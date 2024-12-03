@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             const formData = {
+                productId: Date.now().toString(),
                 productName: productNameInput.value,
                 price: Number(productPriceInput.value),
                 ingredients: productIngredientsInput.value
@@ -158,28 +159,36 @@ function displayProducts(products) {
         return;
     }
 
-    tbody.innerHTML = products.map(product => `
+    tbody.innerHTML = products.map(product => {
+        // Check if ingredients is an array and has more than 1 item
+        const ingredientsArray = Array.isArray(product.ingredients) ? product.ingredients : product.ingredients.split(',');
+        const hasMultipleIngredients = ingredientsArray.length > 1;
+        
+        const ingredientsDisplay = hasMultipleIngredients
+            ? `<div>
+                <span>${ingredientsArray.slice(0, 3).join(', ')}...</span>
+                <button class="btn btn-text text-dark p-0" data-bs-toggle="modal" 
+                        data-bs-target="#ingredientsModal" 
+                        onclick="showIngredients('${ingredientsArray.join(', ')}')">
+                    See More
+                </button>
+               </div>`
+            : `<div>${ingredientsArray[0]}</div>`;
+
+        return `
         <tr>
             <td>${product._id}</td>
             <td>${product.productName}</td>
             <td>${product.price}</td>
-            <td>
-                <div>
-                    <span>${product.ingredients.slice(0, 3).join(', ')}...</span>
-                    <button class="btn btn-text text-dark p-0" data-bs-toggle="modal" 
-                            data-bs-target="#ingredientsModal" 
-                            onclick="showIngredients('${product.ingredients.join(', ')}')">
-                        See More
-                    </button>
-                </div>
-            </td>
+            <td>${ingredientsDisplay}</td>
             <td>
                 <button class="btn btn-sm btn-danger" onclick="deleteProduct('${product._id}')">
                     Delete
                 </button>
             </td>
         </tr>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Show ingredients modal

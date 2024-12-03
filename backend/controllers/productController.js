@@ -4,9 +4,10 @@ const mongoose = require('mongoose');
 // Create a new product
 exports.createProduct = async (req, res) => {
     try {
-        const { productName, price, ingredients, image } = req.body;
+        const { productId, productName, price, ingredients, image } = req.body;
         
         const product = new Product({
+            productId,
             productName,
             price,
             ingredients: ingredients.split(',').map(item => item.trim()),
