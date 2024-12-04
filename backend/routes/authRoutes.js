@@ -1,22 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
+const authController = require('../controllers/authController');
+const auth = require('../middleware/authMiddleware');
 
-router.post('/login', (req, res) => {
-    // Simple test credentials
-    const { username, password } = req.body;
-    
-    // Very basic auth - replace with proper authentication
-    if (username === "admin" && password === "password") {
-        const token = jwt.sign(
-            { username: username },
-            process.env.JWT_SECRET,
-            { expiresIn: '24h' }
-        );
-        res.json({ token });
-    } else {
-        res.status(401).json({ message: "Invalid credentials" });
-    }
-});
+// Auth routes
+router.post('/login', authController.login);
+router.post('/register', authController.register);
+router.get('/verify', auth, authController.verifyToken);
+router.post('/logout', auth, authController.logout);
 
 module.exports = router;

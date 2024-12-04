@@ -101,12 +101,20 @@ const transactionController = {
     // Get all transactions
     getAllTransactions: async (req, res) => {
         try {
+            console.log('Fetching transactions...');
+            
             const transactions = await Transaction.find()
                 .populate({
                     path: 'orderId',
-                    select: 'customerName orderDate totalAmount items status',
+                    select: 'customerName orderDate totalAmount deliveryAddress contactNumber orderDetails',
+                    populate: {
+                        path: 'orderDetails.product',
+                        select: 'productName'
+                    }
                 })
                 .sort({ createdAt: -1 });
+            
+            console.log('Raw transactions:', JSON.stringify(transactions, null, 2));
             
             if (!transactions) {
                 return res.status(404).json({ 
@@ -116,16 +124,59 @@ const transactionController = {
                 });
             }
 
+            // Transform the data to include product names
+            const transformedTransactions = transactions.map(transaction => {
+                console.log('Processing transaction:', transaction._id);
+                
+                // Check if orderId exists and has orderDetails
+                if (!transaction.orderId) {
+                    console.log('No orderId for transaction:', transaction._id);
+                    return {
+                        ...transaction._doc,
+                        orderId: {
+                            customerName: 'N/A',
+                            products: 'N/A',
+                            deliveryAddress: 'N/A',
+                            contactNumber: 'N/A'
+                        }
+                    };
+                }
+
+                // Safely access orderDetails
+                const productNames = transaction.orderId.orderDetails
+                    ? transaction.orderId.orderDetails
+                        .filter(detail => detail && detail.product)
+                        .map(detail => detail.product.productName)
+                        .join(', ')
+                    : 'N/A';
+
+                return {
+                    ...transaction._doc,
+                    orderId: {
+                        ...transaction.orderId._doc,
+                        products: productNames,
+                    }
+                };
+            });
+
+            console.log('Transformed transactions:', JSON.stringify(transformedTransactions, null, 2));
+
             res.json({
                 success: true,
-                data: transactions
+                data: transformedTransactions
             });
         } catch (error) {
-            console.error('Server error:', error);
+            console.error('Detailed error in getAllTransactions:', {
+                message: error.message,
+                stack: error.stack,
+                name: error.name
+            });
+            
             res.status(500).json({ 
                 success: false, 
                 message: 'Error fetching transactions',
-                error: error.message 
+                error: error.message,
+                details: process.env.NODE_ENV === 'development' ? error.stack : undefined
             });
         }
     },

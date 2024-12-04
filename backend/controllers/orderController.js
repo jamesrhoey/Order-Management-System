@@ -132,14 +132,32 @@ const orderController = {
         }
     },
 
-    // Get all orders (with optional status filter)
+    // Get all orders (with optional status and date filter)
     getAllOrders: async (req, res) => {
         try {
-            const { status } = req.query;
-            const query = status ? { status } : {};
+            const { status, date } = req.query;
+            let query = {};
+            
+            // Add status filter if provided
+            if (status) {
+                query.status = status;
+            }
+            
+            // Add date filter if provided
+            if (date) {
+                // Create a date range for the entire day
+                const startDate = new Date(date);
+                const endDate = new Date(date);
+                endDate.setDate(endDate.getDate() + 1);
+                
+                query.orderDate = {
+                    $gte: startDate.toISOString().split('T')[0],
+                    $lt: endDate.toISOString().split('T')[0]
+                };
+            }
             
             const orders = await Order.find(query)
-                .populate('orderDetails.product', 'productName price')
+                .populate('orderDetails.product', 'productName price ingredients')
                 .sort({ createdAt: -1 }); // Most recent orders first
             res.json(orders);
         } catch (error) {
@@ -165,7 +183,7 @@ const orderController = {
     getOrderById: async (req, res) => {
         try {
             const order = await Order.findById(req.params.id)
-                .populate('orderDetails.product', 'productName price');
+                .populate('orderDetails.product', 'productName price ingredients');
             if (!order) {
                 return res.status(404).json({ message: 'Order not found' });
             }

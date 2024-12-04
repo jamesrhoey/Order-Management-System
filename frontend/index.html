@@ -17,29 +17,62 @@
         <div class="row flex-nowrap">
             <!-- Sidebar -->
             <div class="sidebar col-auto min-vh-100 d-flex flex-column justify-content-between">
-                <div class=" p-2">
+                <div class="p-2">
                     <a href="" class="d-flex text-decoration-none mt-1 align-items-center text-white">
-                        <span>TINDAHAN NI RYZEN</span>
+                        <div class="logo-container me-3">
+                            <div class="logo-icon-wrapper">
+                                <i class="fas fa-bolt logo-icon-accent"></i>
+                                <i class="fas fa-shopping-basket logo-icon-main"></i>
+                            </div>
+                        </div>
+                        <div class="brand-text">
+                            <span class="brand-name">Simpli<span class="text-accent">Serve</span></span>
+                            <span class="brand-tagline">Modern POS Solutions</span>
+                        </div>
                     </a>
                     <ul class="nav nav-pills flex-column mt-4">
                         <li class="nav-item py-2 py-sm-0">
                             <a href="index.html" class="nav-link active text-white">
-                                <i class="fa fa-gauge"></i><span class="fs-5 ms-3 d-none d-sm-inline">Dashboard</span>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-chart-line icon-main"></i>
+                                        <i class="fas fa-circle icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3 d-none d-sm-inline">Dashboard</span>
+                                </div>
                             </a>
                         </li>
                         <li class="nav-item py-2 py-sm-0">
                             <a href="order.html" class="nav-link text-white">
-                                <i class="fa fa-clipboard" style="color: #ffffff;"></i><span class="fs-5 ms-3 d-none d-sm-inline">Orders</span>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-shopping-bag icon-main"></i>
+                                        <i class="fas fa-plus icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3 d-none d-sm-inline">Orders</span>
+                                </div>
                             </a>
                         </li>
                         <li class="nav-item py-2 py-sm-0">
                             <a href="product.html" class="nav-link text-white">
-                                <i class="fa fa-table-list" style="color: #ffffff;"></i><span class="fs-5 ms-3 d-none d-sm-inline">Products</span>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-box-open icon-main"></i>
+                                        <i class="fas fa-tag icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3 d-none d-sm-inline">Products</span>
+                                </div>
                             </a>
                         </li>
                         <li class="nav-item py-2 py-sm-0">
                             <a href="transaction.html" class="nav-link text-white">
-                                <i class="fa fa-money-check" style="color: #ffffff;"></i><span class="fs-5 ms-3 d-none d-sm-inline">Transaction</span>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-receipt icon-main"></i>
+                                        <i class="fas fa-check icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3 d-none d-sm-inline">Transactions</span>
+                                </div>
                             </a>
                         </li>
                     </ul>
@@ -293,72 +326,96 @@
                     }
                 });
 
+                // Update modal content
                 const modal = new bootstrap.Modal(document.getElementById('orderSummaryModal'));
                 
-                // Update modal content
-                document.querySelector('.modal-title').innerHTML = `
-                    <i class="fas fa-clipboard-list me-2"></i>Orders for ${new Date(dateString).toLocaleDateString('en-US', { 
-                        month: 'long', 
-                        day: 'numeric', 
-                        year: 'numeric' 
-                    })}
-                `;
-                
-                // Update order items
+                // Update order items section
                 const orderItemsList = document.querySelector('.order-items-list');
                 orderItemsList.innerHTML = ordersForDate.map(order => `
-                    <div class="order-item mb-4">
+                    <div class="order-item mb-3">
                         <div class="d-flex align-items-center mb-2">
                             <i class="fas fa-user-circle me-2"></i>
-                            <span class="fw-bold">${order.customerName || 'Unknown Customer'}</span>
+                            <span class="fw-bold">${order.customerName}</span>
                         </div>
                         <div class="ms-4">
-                            ${(order.orderDetails || []).map(detail => {
-                                // Safely access product details
-                                const productName = detail.product ? detail.product.productName : 'Unknown Product';
-                                const quantity = detail.quantity || 0;
-                                const price = detail.price || 0;
-                                
-                                return `
-                                    <p class="mb-1">
-                                        <i class="fas fa-utensils me-2"></i>${quantity} ${productName} - ₱${price}
-                                    </p>
-                                `;
-                            }).join('')}
-                            <p class="mt-2 fw-bold">Total Amount: ₱${order.totalAmount || 0}</p>
-                            <p class="mb-1"><i class="fas fa-clock me-2"></i>Order Time: ${order.orderTime || 'N/A'}</p>
-                            <p class="mb-1"><i class="fas fa-map-marker-alt me-2"></i>Delivery Address: ${order.deliveryAddress || 'N/A'}</p>
-                            <p class="mb-1"><i class="fas fa-credit-card me-2"></i>Payment Method: ${order.paymentMethod || 'N/A'}</p>
-                            <p class="mb-1">
-                                <i class="fas fa-info-circle me-2"></i>Status: 
-                                <span class="badge ${order.status === 'Completed' ? 'bg-success' : 'bg-warning'}">
-                                    ${order.status || 'N/A'}
-                                </span>
-                            </p>
-                            ${order.notes ? `
+                            ${order.orderDetails.map(detail => `
                                 <p class="mb-1">
-                                    <i class="fas fa-sticky-note me-2"></i>Notes: ${order.notes}
+                                    <i class="fas fa-utensils me-2"></i>
+                                    ${detail.product.productName} x${detail.quantity || 1}
+                                    <span class="text-muted">- ₱${detail.price}</span>
                                 </p>
-                            ` : ''}
+                            `).join('')}
+                            <p class="text-end mb-1 fw-bold">Total: ₱${order.totalAmount}</p>
                         </div>
                     </div>
-                `).join('<hr>');
+                `).join('');
+
+                // Calculate total ingredients needed
+                const ingredientTotals = {};
+                ordersForDate.forEach(order => {
+                    (order.orderDetails || []).forEach(detail => {
+                        if (detail.product && Array.isArray(detail.product.ingredients)) {
+                            detail.product.ingredients.forEach(ingredient => {
+                                const ingredientName = typeof ingredient === 'string' ? ingredient : ingredient.name;
+                                
+                                if (ingredientTotals[ingredientName]) {
+                                    ingredientTotals[ingredientName].quantity += detail.quantity || 1;
+                                } else {
+                                    ingredientTotals[ingredientName] = {
+                                        quantity: detail.quantity || 1,
+                                        products: [detail.product.productName]
+                                    };
+                                }
+                            });
+                        }
+                    });
+                });
+
+                // Helper function to get appropriate icon for ingredient
+                function getIngredientIcon(ingredientName) {
+                    const name = ingredientName.toLowerCase();
+                    if (name.includes('chicken')) return 'fa-drumstick-bite';
+                    if (name.includes('pork')) return 'fa-bacon';
+                    if (name.includes('beef')) return 'fa-cow';
+                    if (name.includes('shrimp')) return 'fa-shrimp';
+                    if (name.includes('fish')) return 'fa-fish';
+                    if (name.includes('noodles') || name.includes('pasta')) return 'fa-wheat-awn';
+                    if (name.includes('sauce') || name.includes('vinegar')) return 'fa-bottle-droplet';
+                    if (name.includes('oil')) return 'fa-oil-can';
+                    if (name.includes('garlic') || name.includes('onion')) return 'fa-seedling';
+                    if (name.includes('pepper') || name.includes('spice')) return 'fa-pepper-hot';
+                    if (name.includes('vegetables') || name.includes('cabbage') || name.includes('carrot')) return 'fa-carrot';
+                    if (name.includes('fruit') || name.includes('calamansi') || name.includes('lemon')) return 'fa-lemon';
+                    return 'fa-utensils'; // default icon
+                }
+
+                // Update ingredients section with appropriate icons
+                const ingredientsList = document.querySelector('.ingredients-list');
+                if (Object.keys(ingredientTotals).length > 0) {
+                    ingredientsList.innerHTML = Object.entries(ingredientTotals).map(([name, details]) => `
+                        <div class="ingredient-item mb-2">
+                            <i class="fas fa-carrot me-2"></i>
+                            <span class="fw-bold">${name}</span>
+                            <div class="ms-4">
+                                <small class="text-muted">
+                                    Required for: ${details.products.join(', ')}
+                                    (${details.quantity} order${details.quantity > 1 ? 's' : ''})
+                                </small>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    ingredientsList.innerHTML = '<p>No ingredients data available</p>';
+                }
                 
                 modal.show();
             } catch (error) {
-                console.error('Error fetching order details:', error);
-                
-                // Check if Swal is defined before using it
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Failed to load order details. Please try again.'
-                    });
-                } else {
-                    // Fallback to alert if Swal is not available
-                    alert('Failed to load order details. Please try again.');
-                }
+                console.error('Error in showOrderSummaryByDate:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load order details. Please try again.'
+                });
             }
         }
 

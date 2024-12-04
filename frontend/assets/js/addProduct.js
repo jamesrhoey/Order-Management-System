@@ -159,7 +159,7 @@ function displayProducts(products) {
         return;
     }
 
-    tbody.innerHTML = products.map(product => {
+    tbody.innerHTML = products.map((product, index) => {
         // Check if ingredients is an array and has more than 1 item
         const ingredientsArray = Array.isArray(product.ingredients) ? product.ingredients : product.ingredients.split(',');
         const hasMultipleIngredients = ingredientsArray.length > 1;
@@ -177,13 +177,13 @@ function displayProducts(products) {
 
         return `
         <tr>
-            <td>${product._id}</td>
+            <td>${index + 1}</td>
             <td>${product.productName}</td>
             <td>${product.price}</td>
             <td>${ingredientsDisplay}</td>
-            <td>
-                <button class="btn btn-sm btn-danger" onclick="deleteProduct('${product._id}')">
-                    Delete
+            <td class="text-center">
+                <button class="btn btn-danger btn-sm" onclick="deleteProduct('${product._id}')">
+                    <i class="fa fa-trash"></i>
                 </button>
             </td>
         </tr>
