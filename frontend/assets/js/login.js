@@ -16,61 +16,52 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         const data = await response.json();
         
         if (response.ok) {
-            // Store the token
+            // Clear any existing data
+            localStorage.clear();
+            
+            // Store the JWT token, not the secret
             localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
+            
+            // Debug: Log the stored token
+            const storedToken = localStorage.getItem('token');
+            console.log('Stored token:', storedToken);
 
-            // Show success message with gif
-            await Swal.fire({
-                title: 'Login Successful',
-                html: '<div>Redirecting to your dashboard...</div>',
-                imageUrl: '/frontend/assets/images/cat-spinning.gif',
-                imageAlt: 'Loading...',
-                allowOutsideClick: false,
-                showConfirmButton: false,
-                timerProgressBar: true,
-                timer: 2000,
-                width: '300px',
-                imageWidth: 150,
-                imageHeight: 150
-            });
+            // Store user data
+            localStorage.setItem('user', JSON.stringify(data.user));
 
             // Redirect to dashboard
             window.location.href = '/frontend/index.html';
         } else {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.onmouseenter = Swal.stopTimer;
-                    toast.onmouseleave = Swal.resumeTimer;
-                }
-            });
-            
-            Toast.fire({
-                icon: "error",
-                title: data.message || 'Login failed'
-            });
+            throw new Error(data.message || 'Login failed');
         }
     } catch (error) {
-        const Toast = Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
-            }
+        console.error('Login error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: error.message || 'An error occurred during login'
         });
-        
-        Toast.fire({
-            icon: "error",
-            title: "Something went wrong. Please try again."
-        });
+    }
+});
+
+// Add this function to verify token format
+function isValidJWT(token) {
+    if (typeof token !== 'string') return false;
+    const parts = token.split('.');
+    if (parts.length !== 3) return false;
+    try {
+        parts.forEach(part => atob(part.replace(/-/g, '+').replace(/_/g, '/')));
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+// Check token on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token || !isValidJWT(token)) {
+        localStorage.clear();
+        window.location.href = '/frontend/login.html';
     }
 });

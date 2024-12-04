@@ -5,56 +5,48 @@ const authController = {
     // Login user
     login: async (req, res) => {
         try {
-            console.log('Login attempt received:', { 
-                username: req.body.username,
-                bodyReceived: !!req.body
-            });
-
-            // Check if JWT_SECRET is available
-            if (!process.env.JWT_SECRET) {
-                console.error('JWT_SECRET is not defined in environment variables');
-                return res.status(500).json({ message: 'Server configuration error' });
-            }
-
             const { username, password } = req.body;
-
-            // Validate input
-            if (!username || !password) {
-                console.log('Missing credentials');
-                return res.status(400).json({ message: 'Please provide username and password' });
-            }
+            console.log('Login attempt for username:', username);
 
             // Find user
-            console.log('Finding user in database...');
             const user = await User.findOne({ username });
-            
             if (!user) {
-                console.log('User not found:', username);
-                return res.status(401).json({ message: 'Invalid credentials' });
+                return res.status(401).json({
+                    success: false,
+                    message: 'Invalid credentials'
+                });
             }
 
-            console.log('User found, checking password...');
             // Check password
             const isMatch = await user.comparePassword(password);
-            
             if (!isMatch) {
-                console.log('Password mismatch for user:', username);
-                return res.status(401).json({ message: 'Invalid credentials' });
+                return res.status(401).json({
+                    success: false,
+                    message: 'Invalid credentials'
+                });
             }
 
-            console.log('Password matched, generating token...');
-            console.log('JWT_SECRET available:', !!process.env.JWT_SECRET);
-            
-            // Create token
+            // Create token with explicit payload
+            const payload = {
+                id: user._id,
+                username: user.username,
+                role: user.role
+            };
+
+            console.log('Creating token with payload:', payload);
+            console.log('Using JWT_SECRET:', process.env.JWT_SECRET);
+
             const token = jwt.sign(
-                { id: user._id, role: user.role },
+                payload,
                 process.env.JWT_SECRET,
-                { expiresIn: '1d' }
+                { expiresIn: '24h' }
             );
 
-            console.log('Login successful for user:', username);
+            console.log('Token created successfully:', token);
+
             // Send response
             res.json({
+                success: true,
                 token,
                 user: {
                     id: user._id,
@@ -62,16 +54,12 @@ const authController = {
                     role: user.role
                 }
             });
-
         } catch (error) {
-            console.error('Detailed login error:', {
-                message: error.message,
-                stack: error.stack,
-                name: error.name
-            });
-            res.status(500).json({ 
-                message: 'Server error',
-                details: process.env.NODE_ENV === 'development' ? error.message : undefined
+            console.error('Login error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error during login',
+                error: error.message
             });
         }
     },
@@ -122,11 +110,25 @@ const authController = {
     // Verify token
     verifyToken: async (req, res) => {
         try {
-            const user = await User.findById(req.user.id).select('-password');
-            res.json(user);
+            const token = req.headers.authorization?.split(' ')[1];
+            if (!token) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'No token provided'
+                });
+            }
+
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            res.json({
+                success: true,
+                decoded
+            });
         } catch (error) {
-            console.error('Token verification error:', error);
-            res.status(500).json({ message: 'Server error' });
+            res.status(401).json({
+                success: false,
+                message: 'Token verification failed',
+                error: error.message
+            });
         }
     },
 

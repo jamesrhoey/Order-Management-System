@@ -68,19 +68,36 @@ const saleController = {
 
     getAllSales: async (req, res) => {
         try {
+            console.log('Getting all sales...');
+            console.log('User making request:', req.user);
+
             const sales = await Sale.find()
                 .populate('transactionId')
                 .populate('items.productId')
                 .sort({ createdAt: -1 });
 
+            console.log('Number of sales found:', sales.length);
+            console.log('Raw sales data:', JSON.stringify(sales, null, 2));
+            
+            if (sales.length === 0) {
+                return res.status(200).json({
+                    success: true,
+                    message: 'No sales records found',
+                    data: []
+                });
+            }
+
             res.json({
                 success: true,
+                count: sales.length,
                 data: sales
             });
         } catch (error) {
+            console.error('Error in getAllSales:', error);
             res.status(500).json({
                 success: false,
-                message: error.message
+                message: 'Error fetching sales',
+                error: error.message
             });
         }
     },
