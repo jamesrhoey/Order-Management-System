@@ -24,7 +24,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             await Swal.fire({
                 title: 'Login Successful',
                 html: '<div>Redirecting to your dashboard...</div>',
-                imageUrl: '/frontend/assets/images/loading.gif',
+                imageUrl: '/frontend/assets/images/cat-spinning.gif',
                 imageAlt: 'Loading...',
                 allowOutsideClick: false,
                 showConfirmButton: false,

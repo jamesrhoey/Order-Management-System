@@ -7,6 +7,11 @@
     --gradient-dark: linear-gradient(135deg, #0a2f25, #0d3d30);
     --gradient-light: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
 }
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
 
 body {
     background: var(--primary-color);
@@ -164,7 +169,7 @@ body {
 }
 
 .btn-add-product {
-    background-color: #28a745;
+    background-color: #016ae9;
     color: #fff;
 }
 

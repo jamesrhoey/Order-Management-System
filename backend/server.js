@@ -8,6 +8,8 @@ const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const saleRoutes = require('./routes/saleRoutes');
 
 
 // Load environment variables
@@ -56,6 +58,8 @@ app.use('/api', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/sales', saleRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

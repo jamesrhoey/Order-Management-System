@@ -96,7 +96,22 @@ const authController = {
 
             await user.save();
 
-            res.status(201).json({ message: 'User registered successfully' });
+            // Optionally, you might want to automatically log in the user after registration
+            const token = jwt.sign(
+                { id: user._id, role: user.role },
+                process.env.JWT_SECRET,
+                { expiresIn: '1d' }
+            );
+
+            res.status(201).json({ 
+                message: 'User registered successfully',
+                token,
+                user: {
+                    id: user._id,
+                    username: user.username,
+                    role: user.role
+                }
+            });
 
         } catch (error) {
             console.error('Registration error:', error);

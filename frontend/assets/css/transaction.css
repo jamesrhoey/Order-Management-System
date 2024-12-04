@@ -7,6 +7,11 @@
     --gradient-dark: linear-gradient(135deg, #0a2f25, #0d3d30);
     --gradient-light: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
 }
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
 
 body {
     background: var(--primary-color);
@@ -47,27 +52,45 @@ body {
 .table {
     border-collapse: separate;
     border-spacing: 0;
+    width: 100%;
+    margin-bottom: 0;
 }
 
 .table thead th {
+    background: var(--gradient-dark);
+    color: var(--text-light);
     font-weight: 600;
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-bottom: 2px solid #dee2e6;
+    padding: 15px;
+    border: none;
+    position: relative;
 }
 
+.table thead th:first-child {
+    border-top-left-radius: 10px;
+}
+
+.table thead th:last-child {
+    border-top-right-radius: 10px;
+}
+y
 .table tbody tr {
-    border-bottom: 1px solid #f8f9fa;
-    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
 }
 
 .table tbody tr:hover {
-    background-color: #f8f9fa;
-    transform: scale(1.001);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background: linear-gradient(to right, rgba(0, 229, 255, 0.05), rgba(0, 229, 255, 0.02));
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+.table tbody td {
+    padding: 15px;
+    vertical-align: middle;
+}
 .wrapper {
     background: white;
     border: 1px solid #e9ecef;

@@ -27,7 +27,6 @@
                         </div>
                         <div class="brand-text">
                             <span class="brand-name">Simpli<span class="text-accent">Serve</span></span>
-                            <span class="brand-tagline">Modern POS Solutions</span>
                         </div>
                     </a>
                     <ul class="nav nav-pills flex-column mt-4">
@@ -78,21 +77,16 @@
                     </ul>
                 </div>
                 <div class="dropdown open p-3">
-                    <button class="btn border-none dropdown-toggle text-white" type="button" id="triggerId" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa-solid fa-user" style="color: #ffffff;"></i><span class="ms-2">Admin</span>
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="triggerId">
-                        <button class="dropdown-item" href="#">Setting</button>
-                        <button class="dropdown-item" href="#">Profile</button>
-                    </div>
+                    <a href="/frontend/profile.html" class="btn text-white">
+                        <i class="fa-solid fa-user"></i><span class="ms-2">Profile</span>
+                    </a>
                 </div>
             </div>
 
             
             <div class="col">
                 <div class="container-fluid mt-4">
-                    <h2 class="text-center mb-4">POS UI</h2>
-                    <div class="d-flex justify-content-end mb-4">
+                    <div class="d-flex justify-content-start mt-5">
                         <button class="btn btn-add-product" data-bs-toggle="modal" data-bs-target="#addProductModal">
                             <i class="fa fa-plus"></i> Add Product
                         </button>
@@ -140,19 +134,23 @@
                                     </tr>
                                 </tbody>
                             </table>
+                            <div id="pagination" class="mt-3 d-flex justify-content-end"></div>
                         </div>
-                        <div class="modal fade" id="ingredientsModal" tabindex="-1" aria-labelledby="ingredientsModalLabel" aria-hidden="true">
+                        <!-- Replace the existing ingredientsModal div with this new modal -->
+                        <div class="modal fade" id="viewProductDetailsModal" tabindex="-1" aria-labelledby="viewProductDetailsModalLabel" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="ingredientsModalLabel">Ingredients</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <div class="modal-header" style="background-color: #1a1a1a; color: white;">
+                                        <h5 class="modal-title" id="viewProductDetailsModalLabel">
+                                            <i class="fa fa-info-circle me-2"></i>Product Details
+                                        </h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <p id="ingredientsContent"></p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <div class="mb-3">
+                                            <h6 class="fw-bold">Ingredients:</h6>
+                                            <p id="modalIngredients"></p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
