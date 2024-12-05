@@ -175,6 +175,21 @@
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col-md-12 px-4 mb-4">
+                        <div id="sales-insights"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 px-4 mb-4">
+                        <div id="order-predictions"></div>
+                    </div>
+                    <div class="col-md-6 px-4 mb-4">
+                        <div id="transaction-anomalies"></div>
+                    </div>
+                </div>
+
                 <div class="col-md-12 px-4">
                     <div class="container">
                         <!-- Pending Orders Header -->
@@ -298,6 +313,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/ai-insights.js"></script>
     <script>
         // API URL
         const API_URL = 'http://localhost:4000/api';
@@ -800,6 +816,59 @@
 
             fetchOrders();
             updateSalesChart('week');
+        });
+
+        // Fetch sales insights
+        async function fetchSalesInsights() {
+            try {
+                const response = await fetch(`${API_URL}/ai/analyze-sales?startDate=2023-01-01&endDate=2023-12-31`);
+                const data = await response.json();
+                if (data.success) {
+                    console.log('Sales Insights:', data.data);
+                    // Display insights on the dashboard
+                }
+            } catch (error) {
+                console.error('Error fetching sales insights:', error);
+            }
+        }
+
+        // Fetch order predictions
+        async function fetchOrderPredictions(orderId) {
+            try {
+                const response = await fetch(`${API_URL}/ai/analyze-order/${orderId}`);
+                const data = await response.json();
+                if (data.success) {
+                    console.log('Order Predictions:', data.data);
+                    // Display predictions on the order page
+                }
+            } catch (error) {
+                console.error('Error fetching order predictions:', error);
+            }
+        }
+
+        // Fetch transaction anomalies
+        async function fetchTransactionAnomalies() {
+            try {
+                const response = await fetch(`${API_URL}/ai/detect-anomalies?startDate=2023-01-01&endDate=2023-12-31`);
+                const data = await response.json();
+                if (data.success) {
+                    console.log('Transaction Anomalies:', data.data);
+                    // Display anomalies on the transaction page
+                }
+            } catch (error) {
+                console.error('Error fetching transaction anomalies:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchSalesInsights();
+            fetchTransactionAnomalies();
+        });
+
+        // Initialize AI Insights
+        document.addEventListener('DOMContentLoaded', async () => {
+            const aiInsights = new AIInsights(API_URL);
+            await aiInsights.initialize();
         });
     </script>
 </body>

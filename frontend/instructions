@@ -7,7 +7,7 @@ order management system
 5. profile.html     - view profile, change password
 
 based on the requirements, the system will be able to manage orders, sales, and transactions of a business.
-create a api integration for the system. using open api 3.0.3
+create a ai that will give sales insights based on the data, order prediction, and transaction prediction.
 
 
 

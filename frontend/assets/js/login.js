@@ -64,3 +64,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100);
     }
 });
+
+function handleLogin(event) {
+    event.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    if (username === 'admin' && password === 'admin') {
+        localStorage.setItem('token', 'dummy-token'); // Simulate login
+        window.location.href = 'index.html';
+    } else {
+        Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: 'Invalid username or password'
+        });
+    }
+}
