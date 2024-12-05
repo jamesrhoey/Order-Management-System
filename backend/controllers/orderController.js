@@ -2,6 +2,52 @@ const Order = require('../models/orderModel');
 const Product = require('../models/productModel');
 const mongoose = require('mongoose');
 const transactionController = require('./transactionController');
+const Sale = require('../models/saleModel');
+
+// Helper function to create sale from order
+const createSaleFromOrder = async (order) => {
+    try {
+        // Ensure order is populated with product details
+        const populatedOrder = await Order.findById(order._id)
+            .populate('orderDetails.product', 'productName price');
+
+        // Format items for sale record
+        const items = populatedOrder.orderDetails.map(detail => {
+            const quantity = detail.quantity || 1;
+            const unitPrice = detail.price;
+            return {
+                productId: detail.product._id,
+                quantity: quantity,
+                unitPrice: unitPrice,
+                subtotal: quantity * unitPrice // Calculate subtotal for each item
+            };
+        });
+
+        // Create sale data
+        const saleData = {
+            transactionId: populatedOrder._id,
+            totalAmount: populatedOrder.totalAmount,
+            items: items,
+            customerDetails: {
+                name: populatedOrder.customerName,
+                address: populatedOrder.deliveryAddress,
+                contactNumber: populatedOrder.contactNumber
+            },
+            saleDate: new Date(),
+            salesPerson: 'System' // Default value for automated sales
+        };
+
+        // Create and save the sale record
+        const newSale = new Sale(saleData);
+        await newSale.save();
+
+        console.log('Sale record created successfully:', newSale);
+        return newSale;
+    } catch (error) {
+        console.error('Error creating sale from order:', error);
+        throw error;
+    }
+};
 
 const orderController = {
     // Create a new order
@@ -92,10 +138,17 @@ const orderController = {
                     .map(detail => detail.product.productName)
                     .join(', ');
 
+                // Create default payment details object
+                const paymentDetails = {
+                    method: paymentMethod,
+                    amount: totalAmount,
+                    status: 'Completed'
+                };
+
                 transaction = await transactionController.createTransactionFromOrder(
                     savedOrder,
                     paymentMethod,
-                    paymentDetails || {}, // Use empty object if paymentDetails not provided
+                    paymentDetails,
                     {
                         notes: notes,
                         deliveryAddress: deliveryAddress,
@@ -103,6 +156,9 @@ const orderController = {
                         products: productNames
                     }
                 );
+
+                // Create sale record
+                await createSaleFromOrder(populatedOrder);
 
                 // Update product inventory
                 for (const detail of populatedOrder.orderDetails) {
@@ -226,6 +282,9 @@ const orderController = {
                         products: productNames
                     }
                 );
+
+                // Create sale record
+                await createSaleFromOrder(order);
 
                 // Update product inventory
                 for (const detail of order.orderDetails) {

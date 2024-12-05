@@ -10,6 +10,54 @@
     <title>Home</title>
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container-fluid {
+            height: 100vh;
+        }
+
+        .main-content {
+            height: 100vh;
+            overflow-y: auto;
+            padding-bottom: 2rem;
+        }
+
+        /* Custom scrollbar styling */
+        .main-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .main-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .main-content::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .main-content::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .main-content {
+            scrollbar-width: thin;
+            scrollbar-color: #888 #f1f1f1;
+        }
+
+        .sidebar {
+            height: 100vh;
+            position: sticky;
+            top: 0;
+        }
+    </style>
 </head>
 
 <body>
@@ -84,32 +132,81 @@
             </div>
 
             <!-- Main Content -->
-            <div class="col py-3">
+            <div class="col py-3 main-content">
                 <div class="dashboard-header">
                     <h3 class="m-0">Dashboard Overview</h3>
                 </div>
                 
+                <!-- Add Sales Chart Section -->
+                <div class="col-md-12 px-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0 text-primary fw-bold">
+                                    <i class="fas fa-chart-line me-2"></i>Daily Sales Overview
+                                </h5>
+                                <div class="d-flex gap-3 align-items-center">
+                                    <!-- Quick Filter Buttons -->
+                                    <div class="btn-group">
+                                        <button class="btn btn-primary btn-sm active" onclick="updateSalesChart('week')">
+                                            <i class="fas fa-calendar-week me-1"></i>This Week
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm" onclick="updateSalesChart('month')">
+                                            <i class="fas fa-calendar-alt me-1"></i>This Month
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Custom Date Range Filter -->
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <input type="date" id="startDate" class="form-control form-control-sm" 
+                                               onchange="updateCustomDateRange()">
+                                        <span class="text-muted">to</span>
+                                        <input type="date" id="endDate" class="form-control form-control-sm" 
+                                               onchange="updateCustomDateRange()">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <div style="height: 400px;">
+                                <canvas id="salesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="col-md-12 px-4">
                     <div class="container">
+                        <!-- Pending Orders Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-clock text-warning me-2 fs-4"></i>
+                                <h4 class="mb-0 text-primary fw-bold">Pending Orders</h4>
+                            </div>
+                            <div class="badge bg-warning text-ligt px-3 py-2">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Showing orders from the last 3 days
+                            </div>
+                        </div>
                         <div class="row g-4">
                             <!-- Total Orders Cards -->
                             <div class="col-md-4">
                                 <div class="order-card shadow-sm rounded-3 p-4 h-100" onclick="showOrderSummaryByDate('Ryzen')">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h5 class="card-title fw-bold mb-0">
-                                            <i class="fas fa-calendar-day me-2"></i>Dec 5, 2025
+                                            <i class="fas fa-calendar-day me-2"></i>
                                         </h5>
-                                        <span class="badge bg-primary">Monday</span>
+                                        <span class="badge bg-primary"></span>
                                     </div>
                                     <div class="order-items">
                                         <div class="order-item d-flex align-items-center mb-2">
                                             <i class="fas fa-user-circle me-2"></i>
-                                            <span class="fw-bold text-primary">Ryzen</span>
+                                            <span class="fw-bold text-primary"></span>
                                         </div>
                                         <div class="order-detail ms-4 mb-2">
-                                            <p class="mb-1"><i class="fas fa-drumstick-bite me-2"></i>50 Honey Glaze Chicken</p>
-                                            <p class="mb-1"><i class="fas fa-utensils me-2"></i>5kg Spaghetti</p>
-                                            <p class="mb-1"><i class="fas fa-box me-2"></i>20kg Pasta</p>
+                                            <p class="mb-1"><i class="fas fa-drumstick-bite me-2"></i></p>
+                                            <p class="mb-1"><i class="fas fa-utensils me-2"></i></p>
+                                            <p class="mb-1"><i class="fas fa-box me-2"></i></p>
                                         </div>
                                     </div>
                                 </div>
@@ -119,19 +216,19 @@
                                 <div class="order-card shadow-sm rounded-3 p-4 h-100" onclick="showOrderSummaryByDate('Jane')">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h5 class="card-title fw-bold mb-0">
-                                            <i class="fas fa-calendar-day me-2"></i>Dec 6, 2025
+                                            <i class="fas fa-calendar-day me-2"></i>
                                         </h5>
-                                        <span class="badge bg-primary">Monday</span>
+                                        <span class="badge bg-primary"></span>
                                     </div>
                                     <div class="order-items">
                                         <div class="order-item d-flex align-items-center mb-2">
                                             <i class="fas fa-user-circle me-2"></i>
-                                            <span class="fw-bold text-primary">Jane</span>
+                                            <span class="fw-bold text-primary"></span>
                                         </div>
                                         <div class="order-detail ms-4 mb-2">
-                                            <p class="mb-1"><i class="fas fa-drumstick-bite me-2"></i>150 Chicken</p>
-                                            <p class="mb-1"><i class="fas fa-box me-2"></i>50 Tubs Pasta</p>
-                                            <p class="mb-1"><i class="fas fa-utensils me-2"></i>5kg Carbonara</p>
+                                            <p class="mb-1"><i class="fas fa-drumstick-bite me-2"></i></p>
+                                            <p class="mb-1"><i class="fas fa-box me-2"></i></p>
+                                            <p class="mb-1"><i class="fas fa-utensils me-2"></i></p>
                                         </div>
                                     </div>
                                 </div>
@@ -141,19 +238,19 @@
                                 <div class="order-card shadow-sm rounded-3 p-4 h-100" onclick="showOrderSummaryByDate('John')">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h5 class="card-title fw-bold mb-0">
-                                            <i class="fas fa-calendar-day me-2"></i>Dec 7, 2025
+                                            <i class="fas fa-calendar-day me-2"></i>
                                         </h5>
-                                        <span class="badge bg-primary">Monday</span>
+                                        <span class="badge bg-primary"></span>
                                     </div>
                                     <div class="order-items">
                                         <div class="order-item d-flex align-items-center mb-2">
                                             <i class="fas fa-user-circle me-2"></i>
-                                            <span class="fw-bold text-primary">John</span>
+                                            <span class="fw-bold text-primary"></span>
                                         </div>
                                         <div class="order-detail ms-4 mb-2">
-                                            <p class="mb-1"><i class="fas fa-drumstick-bite me-2"></i>90 Chicken</p>
-                                            <p class="mb-1"><i class="fas fa-box me-2"></i>10 Tubs Pasta</p>
-                                            <p class="mb-1"><i class="fas fa-utensils me-2"></i>5kg Carbonara</p>
+                                            <p class="mb-1"><i class="fas fa-drumstick-bite me-2"></i></p>
+                                            <p class="mb-1"><i class="fas fa-box me-2"></i></p>
+                                            <p class="mb-1"><i class="fas fa-utensils me-2"></i></p>
                                         </div>
                                     </div>
                                 </div>
@@ -262,7 +359,7 @@
             const container = document.querySelector('.row.g-4');
             
             if (!orders || orders.length === 0) {
-                container.innerHTML = '<div class="col-12"><p class="text-center">No pending orders found</p></div>';
+                container.innerHTML = '<div class="col-12"><p class="text-center text-light">No pending orders found</p></div>';
                 return;
             }
 
@@ -439,9 +536,273 @@
             }
         }
 
-        // Load orders when page loads
-        document.addEventListener('DOMContentLoaded', fetchOrders);
+        // Add Sales Chart Functions
+        let salesChart = null;
+
+        async function fetchSalesData(period = 'week', customStartDate = null, customEndDate = null) {
+            try {
+                const endDate = customEndDate ? new Date(customEndDate) : new Date();
+                let startDate;
+
+                if (customStartDate) {
+                    startDate = new Date(customStartDate);
+                } else {
+                    startDate = new Date();
+                    if (period === 'week') {
+                        startDate.setDate(endDate.getDate() - 7);
+                    } else if (period === 'month') {
+                        startDate.setDate(1); // Start from beginning of month
+                    }
+                }
+
+                // Set time to start of day for start date and end of day for end date
+                startDate.setHours(0, 0, 0, 0);
+                endDate.setHours(23, 59, 59, 999);
+
+                console.log('Date range:', { startDate, endDate });
+
+                // Get the authentication token from localStorage
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    throw new Error('No authentication token found');
+                }
+
+                const response = await fetch(`${API_URL}/sales`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/frontend/login.html';
+                        throw new Error('Please login to view sales data');
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const salesData = await response.json();
+                console.log('Raw sales data:', salesData);
+                
+                // Process sales data
+                const dailySales = {};
+                
+                // Initialize all dates in the range with 0
+                let currentDate = new Date(startDate);
+                while (currentDate <= endDate) {
+                    const dateKey = currentDate.toISOString().split('T')[0];
+                    dailySales[dateKey] = 0;
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                // Aggregate sales by date
+                salesData.data.forEach(sale => {
+                    const saleDate = new Date(sale.saleDate);
+                    saleDate.setHours(0, 0, 0, 0); // Normalize to start of day
+                    
+                    if (saleDate >= startDate && saleDate <= endDate) {
+                        const dateKey = saleDate.toISOString().split('T')[0];
+                        if (dailySales[dateKey] === undefined) {
+                            dailySales[dateKey] = 0;
+                        }
+                        dailySales[dateKey] += sale.totalAmount;
+                        console.log(`Adding sale for ${dateKey}: ${sale.totalAmount} (Total: ${dailySales[dateKey]})`);
+                    }
+                });
+
+                console.log('Processed daily sales:', dailySales);
+
+                // Create arrays for chart
+                const dates = Object.keys(dailySales).sort();
+                const amounts = dates.map(date => dailySales[date]);
+
+                return {
+                    labels: dates.map(date => new Date(date).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric'
+                    })),
+                    data: amounts
+                };
+            } catch (error) {
+                console.error('Error fetching sales data:', error);
+                if (error.message === 'No authentication token found') {
+                    window.location.href = '/frontend/login.html';
+                }
+                throw error;
+            }
+        }
+
+        async function updateSalesChart(period = 'week', customStartDate = null, customEndDate = null) {
+            try {
+                // Update button states
+                const weekBtn = document.querySelector('button[onclick="updateSalesChart(\'week\')"]');
+                const monthBtn = document.querySelector('button[onclick="updateSalesChart(\'month\')"]');
+                
+                if (!customStartDate && !customEndDate) {
+                    if (period === 'week') {
+                        weekBtn.classList.add('active', 'btn-primary');
+                        weekBtn.classList.remove('btn-outline-primary');
+                        monthBtn.classList.remove('active', 'btn-primary');
+                        monthBtn.classList.add('btn-outline-primary');
+                    } else {
+                        monthBtn.classList.add('active', 'btn-primary');
+                        monthBtn.classList.remove('btn-outline-primary');
+                        weekBtn.classList.remove('active', 'btn-primary');
+                        weekBtn.classList.add('btn-outline-primary');
+                    }
+                } else {
+                    // Remove active state from both buttons when using custom range
+                    weekBtn.classList.remove('active', 'btn-primary');
+                    monthBtn.classList.remove('active', 'btn-primary');
+                    weekBtn.classList.add('btn-outline-primary');
+                    monthBtn.classList.add('btn-outline-primary');
+                }
+
+                const { labels, data } = await fetchSalesData(period, customStartDate, customEndDate);
+
+                if (salesChart) {
+                    salesChart.destroy();
+                }
+
+                const ctx = document.getElementById('salesChart').getContext('2d');
+                
+                // Create gradient
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, 'rgba(78, 115, 223, 0.2)');
+                gradient.addColorStop(1, 'rgba(78, 115, 223, 0)');
+
+                salesChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Daily Sales',
+                            data: data,
+                            borderColor: '#4e73df',
+                            backgroundColor: gradient,
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#4e73df',
+                            pointBorderColor: '#ffffff',
+                            pointHoverBackgroundColor: '#ffffff',
+                            pointHoverBorderColor: '#4e73df',
+                            pointBorderWidth: 2,
+                            pointHoverBorderWidth: 3,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: '#ffffff',
+                                titleColor: '#000000',
+                                bodyColor: '#000000',
+                                bodyFont: {
+                                    size: 14
+                                },
+                                titleFont: {
+                                    size: 16,
+                                    weight: 'bold'
+                                },
+                                padding: 12,
+                                borderColor: '#e3e6f0',
+                                borderWidth: 1,
+                                displayColors: false,
+                                callbacks: {
+                                    title: function(context) {
+                                        return context[0].label;
+                                    },
+                                    label: function(context) {
+                                        return '₱' + context.parsed.y.toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        });
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#e3e6f0',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    },
+                                    padding: 10,
+                                    callback: function(value) {
+                                        return '₱' + value.toLocaleString(undefined, {
+                                            minimumFractionDigits: 0,
+                                            maximumFractionDigits: 0
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error updating sales chart:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load sales data. Please try again.'
+                });
+            }
+        }
+
+        function updateCustomDateRange() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (startDate && endDate) {
+                if (new Date(startDate) > new Date(endDate)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid Date Range',
+                        text: 'Start date cannot be after end date'
+                    });
+                    return;
+                }
+                updateSalesChart('custom', startDate, endDate);
+            }
+        }
+
+        // Initialize date inputs with default values
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            const lastWeek = new Date(today);
+            lastWeek.setDate(today.getDate() - 7);
+
+            document.getElementById('startDate').value = lastWeek.toISOString().split('T')[0];
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+
+            fetchOrders();
+            updateSalesChart('week');
+        });
     </script>
 </body>
 
 </html>
+

@@ -19,18 +19,14 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             // Clear any existing data
             localStorage.clear();
             
-            // Store the JWT token, not the secret
+            // Store the JWT token and user data
             localStorage.setItem('token', data.token);
-            
-            // Debug: Log the stored token
-            const storedToken = localStorage.getItem('token');
-            console.log('Stored token:', storedToken);
-
-            // Store user data
             localStorage.setItem('user', JSON.stringify(data.user));
 
-            // Redirect to dashboard
-            window.location.href = '/frontend/index.html';
+            // Use setTimeout to prevent rapid navigation
+            setTimeout(() => {
+                window.location.href = '/frontend/index.html';
+            }, 100);
         } else {
             throw new Error(data.message || 'Login failed');
         }
@@ -60,8 +56,11 @@ function isValidJWT(token) {
 // Check token on page load
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
-    if (!token || !isValidJWT(token)) {
+    // Only redirect if we're not already on the login page
+    if ((!token || !isValidJWT(token)) && !window.location.pathname.includes('login.html')) {
         localStorage.clear();
-        window.location.href = '/frontend/login.html';
+        setTimeout(() => {
+            window.location.href = '/frontend/login.html';
+        }, 100);
     }
 });
