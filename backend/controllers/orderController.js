@@ -3,6 +3,7 @@ const Product = require('../models/productModel');
 const mongoose = require('mongoose');
 const transactionController = require('./transactionController');
 const Sale = require('../models/saleModel');
+const Transaction = require('../models/transactionModel');
 
 // Helper function to create sale from order
 const createSaleFromOrder = async (order) => {
@@ -273,22 +274,76 @@ const orderController = {
     updateOrderStatus: async (req, res) => {
         try {
             const { status } = req.body;
+            
+            // First, get the current order to check its status
+            const currentOrder = await Order.findById(req.params.id);
+            if (!currentOrder) {
+                return res.status(404).json({ message: 'Order not found' });
+            }
+
+            console.log('Current Order Status:', currentOrder.status);
+            console.log('New Status:', status);
+
+            // If status is being changed to Cancelled and order was previously Completed
+            if (status === 'Cancelled' && currentOrder.status === 'Completed') {
+                console.log('Attempting to delete associated records...');
+
+                // Delete associated transaction
+                const deletedTransaction = await Transaction.findOneAndDelete({ 
+                    orderId: currentOrder._id 
+                });
+                console.log('Deleted Transaction:', deletedTransaction);
+
+                // Delete associated sale
+                const deletedSale = await Sale.findOneAndDelete({ 
+                    transactionId: currentOrder._id 
+                });
+                console.log('Deleted Sale:', deletedSale);
+
+                if (!deletedTransaction || !deletedSale) {
+                    console.log('Searching with different criteria...');
+                    // Try alternative search if initial deletion failed
+                    const transaction = await Transaction.findOne({ orderId: currentOrder._id });
+                    const sale = await Sale.findOne({ transactionId: currentOrder._id });
+                    console.log('Found Transaction:', transaction);
+                    console.log('Found Sale:', sale);
+
+                    if (transaction) await transaction.remove();
+                    if (sale) await sale.remove();
+                }
+
+                // Revert inventory changes
+                for (const detail of currentOrder.orderDetails) {
+                    const updatedProduct = await Product.findByIdAndUpdate(
+                        detail.product._id,
+                        {
+                            $inc: { 
+                                stockQuantity: detail.quantity,
+                                soldQuantity: -detail.quantity 
+                            }
+                        },
+                        { new: true }
+                    );
+                    console.log('Updated Product Inventory:', updatedProduct);
+                }
+            }
+
+            // Update the order status
             const order = await Order.findByIdAndUpdate(
                 req.params.id,
                 { status },
                 { new: true }
             ).populate('orderDetails.product', 'productName');
 
-            if (!order) {
-                return res.status(404).json({ message: 'Order not found' });
-            }
-
-            // If status is completed, create a transaction
-            if (status === 'Completed') {
-                // Get product names for the transaction
-                const productNames = order.orderDetails
-                    .map(detail => detail.product.productName)
-                    .join(', ');
+            // If status is being changed to completed for the first time
+            if (status === 'Completed' && currentOrder.status !== 'Completed') {
+                // Check if transaction already exists
+                const existingTransaction = await Transaction.findOne({ orderId: order._id });
+                if (!existingTransaction) {
+                    // Get product names for the transaction
+                    const productNames = order.orderDetails
+                        .map(detail => detail.product.productName)
+                        .join(', ');
 
                 // Create transaction
                 await transactionController.createTransactionFromOrder(
@@ -303,20 +358,25 @@ const orderController = {
                     }
                 );
 
-                // Create sale record
-                await createSaleFromOrder(order);
+                    // Check if sale already exists
+                    const existingSale = await Sale.findOne({ transactionId: order._id });
+                    if (!existingSale) {
+                        // Create sale record
+                        await createSaleFromOrder(order);
+                    }
 
-                // Update product inventory
-                for (const detail of order.orderDetails) {
-                    await Product.findByIdAndUpdate(
-                        detail.product._id,
-                        {
-                            $inc: { 
-                                stockQuantity: -detail.quantity,
-                                soldQuantity: detail.quantity 
+                    // Update product inventory
+                    for (const detail of order.orderDetails) {
+                        await Product.findByIdAndUpdate(
+                            detail.product._id,
+                            {
+                                $inc: { 
+                                    stockQuantity: -detail.quantity,
+                                    soldQuantity: detail.quantity 
+                                }
                             }
-                        }
-                    );
+                        );
+                    }
                 }
             }
 
