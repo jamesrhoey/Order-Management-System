@@ -252,24 +252,42 @@ const transactionController = {
         }
     },
 
-    // Add this new method
-    createTransactionFromOrder: async (order, paymentMethod, paymentDetails, additionalDetails) => {
+    // Create transaction from order
+    createTransactionFromOrder: async (order, paymentMethod, paymentDetails, additionalInfo = {}) => {
         try {
-            const transaction = new Transaction({
+            // Only create transaction if order is completed
+            if (order.status !== 'Completed') {
+                console.log('Skipping transaction creation - Order not completed');
+                return null;
+            }
+
+            const newTransaction = new Transaction({
                 orderId: order._id,
                 amount: order.totalAmount,
                 paymentMethod: paymentMethod,
-                paymentDetails: paymentDetails,
-                transactionDate: new Date(),
-                notes: additionalDetails.notes,
-                deliveryAddress: additionalDetails.deliveryAddress,
-                contactNumber: additionalDetails.contactNumber,
-                products: additionalDetails.products
+                paymentDetails: {
+                    ...paymentDetails,
+                    customerName: order.customerName,
+                    deliveryAddress: additionalInfo.deliveryAddress,
+                    contactNumber: additionalInfo.contactNumber,
+                    products: additionalInfo.products
+                },
+                notes: additionalInfo.notes,
+                status: 'Completed'
             });
 
-            return await transaction.save();
+            const savedTransaction = await newTransaction.save();
+
+            // Update order payment status
+            await Order.findByIdAndUpdate(order._id, {
+                status: 'Completed',
+                '$set': { 'paymentStatus': 'Paid' }
+            });
+
+            console.log('Transaction created successfully:', savedTransaction);
+            return savedTransaction;
         } catch (error) {
-            console.error('Error creating transaction:', error);
+            console.error('Error creating transaction from order:', error);
             throw error;
         }
     },
