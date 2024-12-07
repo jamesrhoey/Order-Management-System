@@ -19,13 +19,15 @@ const createSaleFromOrder = async (order) => {
                 productId: detail.product._id,
                 quantity: quantity,
                 unitPrice: unitPrice,
-                subtotal: quantity * unitPrice // Calculate subtotal for each item
+                subtotal: quantity * unitPrice
             };
         });
 
-        // Create sale data
+        // Create sale data with required fields
         const saleData = {
             transactionId: populatedOrder._id,
+            amount: populatedOrder.totalAmount,
+            paymentMethod: populatedOrder.paymentMethod,
             totalAmount: populatedOrder.totalAmount,
             items: items,
             customerDetails: {
@@ -34,7 +36,7 @@ const createSaleFromOrder = async (order) => {
                 contactNumber: populatedOrder.contactNumber
             },
             saleDate: new Date(),
-            salesPerson: 'System' // Default value for automated sales
+            salesPerson: 'System'
         };
 
         // Create and save the sale record
@@ -97,7 +99,12 @@ const orderController = {
                     }
                     
                     orderDetails.push({
-                        product: productId,
+                        product: product._id, // Store the reference
+                        productData: {        // Store essential product data
+                            productName: product.productName,
+                            price: product.price,
+                            ingredients: product.ingredients
+                        },
                         price: product.price,
                         quantity: 1
                     });
@@ -112,6 +119,7 @@ const orderController = {
                 });
             }
 
+            // Create and save the new order
             const newOrder = new Order({
                 customerName,
                 deliveryAddress,
@@ -188,37 +196,49 @@ const orderController = {
         }
     },
 
-    // Get all orders (with optional status and date filter)
+    // Get all orders
     getAllOrders: async (req, res) => {
         try {
-            const { status, date } = req.query;
-            let query = {};
+            const query = {};
             
-            // Add status filter if provided
-            if (status) {
-                query.status = status;
-            }
-            
-            // Add date filter if provided
-            if (date) {
-                // Create a date range for the entire day
-                const startDate = new Date(date);
-                const endDate = new Date(date);
-                endDate.setDate(endDate.getDate() + 1);
-                
+            if (req.query.startDate && req.query.endDate) {
+                const startDate = new Date(req.query.startDate);
+                const endDate = new Date(req.query.endDate);
                 query.orderDate = {
                     $gte: startDate.toISOString().split('T')[0],
                     $lt: endDate.toISOString().split('T')[0]
                 };
             }
             
-            const orders = await Order.find(query)
-                .populate('orderDetails.product', 'productName price ingredients')
-                .sort({ createdAt: -1 }); // Most recent orders first
+            let orders = await Order.find(query)
+                .populate({
+                    path: 'orderDetails.product',
+                    select: 'productName price ingredients'
+                })
+                .lean()
+                .sort({ createdAt: -1 });
+
+            // Transform orders to ensure product data is always available
+            orders = orders.map(order => ({
+                ...order,
+                orderDetails: order.orderDetails.map(detail => ({
+                    ...detail,
+                    product: detail.product || detail.productData || {
+                        _id: 'deleted',
+                        productName: 'Product No Longer Available',
+                        price: detail.price,
+                        ingredients: ['N/A']
+                    }
+                }))
+            }));
+
             res.json(orders);
         } catch (error) {
             console.error('Error fetching orders:', error);
-            res.status(500).json({ message: error.message });
+            res.status(500).json({ 
+                message: 'Error fetching orders',
+                error: error.message 
+            });
         }
     },
 

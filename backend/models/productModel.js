@@ -11,6 +11,12 @@ const productSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    category: {
+        type: String,
+        required: true,
+        enum: ['Starters', 'Pasta', 'Mains', 'Dessert'],
+        default: 'Mains'
+    },
     price: {
         type: Number,
         required: true,
@@ -21,7 +27,7 @@ const productSchema = new mongoose.Schema({
         required: true,
         validate: {
             validator: function(v) {
-                return v && v.length > 0;
+                return Array.isArray(v) && v.length > 0;
             },
             message: 'Product must have at least one ingredient'
         }
@@ -37,6 +43,7 @@ const productSchema = new mongoose.Schema({
 // Add index for faster queries
 productSchema.index({ productName: 1 });
 productSchema.index({ price: 1 });
+productSchema.index({ category: 1 });
 
 // Pre-save middleware to update the updatedAt timestamp
 productSchema.pre('save', function(next) {
@@ -59,6 +66,12 @@ productSchema.statics.findByPriceRange = function(minPrice, maxPrice) {
     });
 };
 
+// Add static method to find products by category
+productSchema.statics.findByCategory = function(category) {
+    return this.find({ category });
+};
+
 const Product = mongoose.model('Product', productSchema);
 
 module.exports = Product;
+

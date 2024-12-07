@@ -1,12 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
-const authMiddleware = require('../middleware/authMiddleware');
+const { authenticateToken } = require('../middleware/authMiddleware');
 
-// Get user profile
-router.get('/profile', authMiddleware, userController.getProfile);
+// Get user profile (protected route)
+router.get('/profile', authenticateToken, userController.getProfile);
 
-// Change password
-router.post('/change-password', authMiddleware, userController.changePassword);
+// Change password (protected route)
+router.post('/change-password', authenticateToken, userController.changePassword);
+
+// Get all users (protected route)
+router.get('/', authenticateToken, userController.getAllUsers);
+
+// Get user by ID
+router.get('/:id', authenticateToken, userController.getUserById);
+
+// Update user
+router.put('/:id', authenticateToken, userController.updateUser);
+
+// Delete user
+router.delete('/:id', authenticateToken, userController.deleteUser);
 
 module.exports = router;

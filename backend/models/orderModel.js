@@ -28,8 +28,12 @@ const orderSchema = new mongoose.Schema({
     orderDetails: [{
         product: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Product',
-            required: true
+            ref: 'Product'
+        },
+        productData: {
+            productName: String,
+            price: Number,
+            ingredients: [String]
         },
         price: {
             type: Number,

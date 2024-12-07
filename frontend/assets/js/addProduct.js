@@ -5,11 +5,17 @@ const API_URL = 'http://localhost:4000/api';
 const ITEMS_PER_PAGE = 7;
 let currentPage = 1;
 let totalProducts = [];
+let currentCategory = '';
 
 // Fetch all products
 async function fetchProducts() {
     try {
-        const response = await fetch(`${API_URL}/products`, {
+        let url = `${API_URL}/products`;
+        if (currentCategory) {
+            url += `?category=${currentCategory}`;
+        }
+        
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -41,62 +47,95 @@ document.addEventListener('DOMContentLoaded', function() {
         addProductForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Get form elements
-            const productNameInput = document.getElementById('productName');
-            const productPriceInput = document.getElementById('productPrice');
-            const productIngredientsInput = document.getElementById('productIngredients');
+            const productName = document.getElementById('productName').value.trim();
+            const productCategory = document.getElementById('productCategory').value;
+            const productPrice = document.getElementById('productPrice').value;
+            const ingredientsText = document.getElementById('productIngredients').value.trim();
 
-            // Validate that all required elements exist
-            if (!productNameInput || !productPriceInput || !productIngredientsInput) {
-                console.error('Required form elements not found');
+            // Validate category
+            if (!productCategory) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Input',
+                    text: 'Please select a category'
+                });
                 return;
             }
 
-            const formData = {
+            // Validate ingredients format
+            if (!ingredientsText.includes(',')) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Format',
+                    text: 'Please separate ingredients with commas'
+                });
+                return;
+            }
+
+            // Convert ingredients string to array and clean up
+            const ingredients = ingredientsText
+                .split(',')
+                .map(item => item.trim())
+                .filter(item => item.length > 0);
+
+            if (ingredients.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Input',
+                    text: 'Please enter at least one ingredient'
+                });
+                return;
+            }
+
+            // Create the request payload
+            const productData = {
                 productId: Date.now().toString(),
-                productName: productNameInput.value,
-                price: Number(productPriceInput.value),
-                ingredients: productIngredientsInput.value
+                productName: productName,
+                category: productCategory,
+                price: Number(productPrice),
+                ingredients: ingredients
             };
 
+            console.log('Sending product data:', productData); // Debug log
+
             try {
-                console.log('Sending request to:', `${API_URL}/products`);
-                console.log('Request payload:', formData);
-                
-                const response = await fetch(`${API_URL}/products`, {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = '/frontend/login.html';
+                    return;
+                }
+
+                const response = await fetch('http://localhost:4000/api/products', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify(formData)
+                    body: JSON.stringify(productData)
                 });
+
+                const data = await response.json();
+                console.log('Server response:', data);
 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Server response:', errorText);
-                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${JSON.stringify(data)}`);
                 }
 
-                const result = await response.json();
-                console.log('Success response:', result);
-                
+                // Success handling
                 Swal.fire({
                     icon: 'success',
-                    title: 'Success',
+                    title: 'Success!',
                     text: 'Product added successfully'
                 });
-                
-                // Reset form and close modal
+
+                // Clear form and close modal
                 addProductForm.reset();
                 const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
-                if (modal) {
-                    modal.hide();
-                }
-                
-                // Refresh the products list
+                modal.hide();
+
+                // Refresh product list
                 await fetchProducts();
-                
+
             } catch (error) {
                 console.error('Error adding product:', error);
                 Swal.fire({
@@ -106,8 +145,60 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
+
+        // Add real-time validation for ingredients
+        const ingredientsInput = document.getElementById('productIngredients');
+        ingredientsInput.addEventListener('input', function() {
+            const value = this.value.trim();
+            const words = value.split(' ').filter(word => word.length > 0);
+            const hasComma = value.includes(',');
+            
+            // Only show validation error if there are multiple words without commas
+            if (words.length > 1 && !hasComma) {
+                this.classList.add('is-invalid');
+                // Remove existing feedback if any
+                const existingFeedback = this.nextElementSibling;
+                if (existingFeedback?.classList.contains('invalid-feedback')) {
+                    existingFeedback.remove();
+                }
+                // Add new feedback
+                const feedback = document.createElement('div');
+                feedback.className = 'invalid-feedback';
+                feedback.textContent = 'Please separate ingredients with commas';
+                this.parentNode.appendChild(feedback);
+            } else {
+                this.classList.remove('is-invalid');
+                const existingFeedback = this.nextElementSibling;
+                if (existingFeedback?.classList.contains('invalid-feedback')) {
+                    existingFeedback.remove();
+                }
+            }
+        });
     }
+
+    // Add category filter handler
+    const categoryFilter = document.getElementById('categoryFilter');
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', function() {
+            currentCategory = this.value;
+            currentPage = 1; // Reset to first page when filtering
+            fetchProducts();
+        });
+    }
+
+    // Initial products load
+    fetchProducts();
 });
+
+// Add this function to check if the token exists
+function checkAuthentication() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/frontend/login.html';
+        return false;
+    }
+    return true;
+}
 
 // Delete product
 async function deleteProduct(productId) {
@@ -152,149 +243,134 @@ async function deleteProduct(productId) {
     }
 }
 
+// Add this helper function for category badge styling
+function getCategoryBadgeClass(category) {
+    switch (category) {
+        case 'Starters':
+            return 'bg-info text-white';
+        case 'Pasta':
+            return 'bg-warning text-dark';
+        case 'Mains':
+            return 'bg-success text-white';
+        case 'Dessert':
+            return 'bg-danger text-white';
+        default:
+            return 'bg-secondary text-white';
+    }
+}
+
 // Display products in the table
 function displayProducts(products) {
-    const tbody = document.getElementById('userDetails');
-    if (!products || products.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="5" class="text-center py-4">
-                    <i class="fa fa-info-circle me-2"></i>No products found
-                </td>
-            </tr>
-        `;
-        return;
-    }
+    const tableBody = document.getElementById('userDetails');
+    if (!tableBody) return;
 
-    // Store the products globally
-    totalProducts = products;
-    
     // Calculate pagination
+    totalProducts = products;
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
     const paginatedProducts = products.slice(startIndex, endIndex);
-    
-    tbody.innerHTML = paginatedProducts.map((product, index) => {
-        const ingredientsArray = Array.isArray(product.ingredients) ? product.ingredients : product.ingredients.split(',');
-        
-        return `
-        <tr>
-            <td>${startIndex + index + 1}</td>
-            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-utensils me-2"></i>
-                    <span>${product.productName}</span>
-                </div>
+
+    // Clear existing content
+    tableBody.innerHTML = '';
+
+    if (products.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td colspan="5" class="text-center py-4">
+                <i class="fas fa-search me-2"></i>
+                No products found${currentCategory ? ` in category "${currentCategory}"` : ''}.
             </td>
-            <td>₱${product.price.toFixed(2)}</td>
+        `;
+        tableBody.appendChild(row);
+        return;
+    }
+
+    // Add products to table
+    paginatedProducts.forEach(product => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${product.productId}</td>
+            <td>${product.productName}</td>
+            <td>₱${product.price}</td>
             <td>
-                <a href="#" class="text-primary text-decoration-none" 
-                   onclick="viewProductDetails('${product.productName}', '${product.price}', '${ingredientsArray.join(', ')}')">
-                    <i class="fas fa-eye me-1"></i>View Ingredients
-                </a>
-            </td>
-            <td class="text-center">
-                <button class="btn btn-danger btn-sm" onclick="deleteProduct('${product._id}')">
-                    <i class="fa fa-trash"></i>
+                <button class="btn  text-primary" onclick="viewProductDetails('${product.productName}', '${product.category}', ${product.price}, '${product.ingredients.join(', ')}')">
+                    <i class="fas fa-eye"></i> View Details
                 </button>
             </td>
-        </tr>
+            <td>
+                <button class="btn btn-sm btn-danger" onclick="deleteProduct('${product._id}')">Delete</button>
+            </td>
         `;
-    }).join('');
+        tableBody.appendChild(row);
+    });
 
     // Update pagination controls
-    renderPaginationControls(products.length);
+    updatePaginationControls(products.length);
 }
 
-// Replace the existing displayPagination function with this new one
-function renderPaginationControls(totalItems) {
-    const paginationControls = document.getElementById('pagination');
-    paginationControls.innerHTML = '';
+// Add the pagination control function
+function updatePaginationControls(totalItems) {
+    const paginationDiv = document.getElementById('pagination');
+    if (!paginationDiv) return;
+
     const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+    
+    // Clear existing pagination
+    paginationDiv.innerHTML = '';
+    
+    // Don't show pagination if there's only one page or no items
+    if (totalPages <= 1) return;
 
     // Create pagination container
-    const paginationContainer = document.createElement('div');
-    paginationContainer.className = 'pagination-container d-flex gap-2';
+    const nav = document.createElement('nav');
+    const ul = document.createElement('ul');
+    ul.className = 'pagination mb-0';
 
     // Previous button
-    const prevButton = document.createElement('button');
-    prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
-    prevButton.className = `btn btn-outline-secondary ${currentPage === 1 ? 'disabled' : ''}`;
-    prevButton.onclick = () => {
-        if (currentPage > 1) {
-            currentPage--;
-            displayProducts(totalProducts);
-        }
-    };
-    paginationContainer.appendChild(prevButton);
+    const prevLi = document.createElement('li');
+    prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+    prevLi.innerHTML = `
+        <button class="page-link" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+            <i class="fas fa-chevron-left"></i>
+        </button>
+    `;
+    ul.appendChild(prevLi);
 
     // Page numbers
-    let startPage = Math.max(1, currentPage - 2);
-    let endPage = Math.min(totalPages, startPage + 4);
-
-    // Adjust start page if we're near the end
-    if (endPage - startPage < 4) {
-        startPage = Math.max(1, endPage - 4);
-    }
-
-    // First page and ellipsis
-    if (startPage > 1) {
-        const firstButton = createPageButton(1);
-        paginationContainer.appendChild(firstButton);
-        if (startPage > 2) {
-            const ellipsis = document.createElement('span');
-            ellipsis.className = 'btn btn-outline-secondary disabled';
-            ellipsis.textContent = '...';
-            paginationContainer.appendChild(ellipsis);
-        }
-    }
-
-    // Page numbers
-    for (let i = startPage; i <= endPage; i++) {
-        const pageButton = createPageButton(i);
-        paginationContainer.appendChild(pageButton);
-    }
-
-    // Last page and ellipsis
-    if (endPage < totalPages) {
-        if (endPage < totalPages - 1) {
-            const ellipsis = document.createElement('span');
-            ellipsis.className = 'btn btn-outline-secondary disabled';
-            ellipsis.textContent = '...';
-            paginationContainer.appendChild(ellipsis);
-        }
-        const lastButton = createPageButton(totalPages);
-        paginationContainer.appendChild(lastButton);
+    for (let i = 1; i <= totalPages; i++) {
+        const li = document.createElement('li');
+        li.className = `page-item ${currentPage === i ? 'active' : ''}`;
+        li.innerHTML = `
+            <button class="page-link" onclick="changePage(${i})">${i}</button>
+        `;
+        ul.appendChild(li);
     }
 
     // Next button
-    const nextButton = document.createElement('button');
-    nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
-    nextButton.className = `btn btn-outline-secondary ${currentPage === totalPages ? 'disabled' : ''}`;
-    nextButton.onclick = () => {
-        if (currentPage < totalPages) {
-            currentPage++;
-            displayProducts(totalProducts);
-        }
-    };
-    paginationContainer.appendChild(nextButton);
+    const nextLi = document.createElement('li');
+    nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+    nextLi.innerHTML = `
+        <button class="page-link" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    `;
+    ul.appendChild(nextLi);
 
-    paginationControls.appendChild(paginationContainer);
+    nav.appendChild(ul);
+    paginationDiv.appendChild(nav);
 }
 
-// Add this helper function for creating page buttons
-function createPageButton(pageNumber) {
-    const button = document.createElement('button');
-    button.textContent = pageNumber;
-    button.className = `btn ${currentPage === pageNumber ? 'btn-primary' : 'btn-outline-primary'}`;
-    button.onclick = () => {
-        if (currentPage !== pageNumber) {
-            currentPage = pageNumber;
-            displayProducts(totalProducts);
-        }
-    };
-    return button;
+// Add the page change function
+function changePage(newPage) {
+    if (newPage < 1 || newPage > Math.ceil(totalProducts.length / ITEMS_PER_PAGE)) {
+        return;
+    }
+    currentPage = newPage;
+    displayProducts(totalProducts);
 }
+
+// Make sure these functions are available globally
+window.changePage = changePage;
 
 // Show ingredients modal
 function showIngredients(ingredients) {
@@ -315,7 +391,7 @@ window.addEventListener('unhandledrejection', function(event) {
     });
 });
 
-function viewProductDetails( ingredients) {
+function viewProductDetails(productName, category, price, ingredients) {
     const modalElement = document.getElementById('viewProductDetailsModal');
     
     if (!modalElement) {
@@ -330,12 +406,30 @@ function viewProductDetails( ingredients) {
             <div class="modal-content">
                 <div class="modal-header" style="background-color: #1a1a1a; color: white;">
                     <h5 class="modal-title">
-                        <i class="fa fa-info-circle me-2"></i>Ingredients
+                        <i class="fa fa-info-circle me-2"></i>${productName}
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>${ingredients || 'No ingredients listed'}</p>
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Category:</h6>
+                        <span class="badge ${getCategoryBadgeClass(category)}">${category}</span>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Price:</h6>
+                        <p>₱${price}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Ingredients:</h6>
+                        <ul class="list-unstyled">
+                            ${ingredients.split(',').map(ingredient => `
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    ${ingredient.trim()}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>

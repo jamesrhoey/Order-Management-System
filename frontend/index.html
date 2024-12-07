@@ -10,54 +10,6 @@
     <title>Home</title>
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            overflow: hidden;
-            height: 100vh;
-        }
-
-        .container-fluid {
-            height: 100vh;
-        }
-
-        .main-content {
-            height: 100vh;
-            overflow-y: auto;
-            padding-bottom: 2rem;
-        }
-
-        /* Custom scrollbar styling */
-        .main-content::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .main-content::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        .main-content::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-
-        .main-content::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        /* Hide scrollbar for IE, Edge and Firefox */
-        .main-content {
-            scrollbar-width: thin;
-            scrollbar-color: #888 #f1f1f1;
-        }
-
-        .sidebar {
-            height: 100vh;
-            position: sticky;
-            top: 0;
-        }
-    </style>
 </head>
 
 <body>
@@ -137,44 +89,6 @@
                     <h3 class="m-0">Dashboard Overview</h3>
                 </div>
                 
-                <!-- Add Sales Chart Section -->
-                <div class="col-md-12 px-4 mb-4">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-white py-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0 text-primary fw-bold">
-                                    <i class="fas fa-chart-line me-2"></i>Daily Sales Overview
-                                </h5>
-                                <div class="d-flex gap-3 align-items-center">
-                                    <!-- Quick Filter Buttons -->
-                                    <div class="btn-group">
-                                        <button class="btn btn-primary btn-sm active" onclick="updateSalesChart('week')">
-                                            <i class="fas fa-calendar-week me-1"></i>This Week
-                                        </button>
-                                        <button class="btn btn-outline-primary btn-sm" onclick="updateSalesChart('month')">
-                                            <i class="fas fa-calendar-alt me-1"></i>This Month
-                                        </button>
-                                    </div>
-                                    
-                                    <!-- Custom Date Range Filter -->
-                                    <div class="d-flex gap-2 align-items-center">
-                                        <input type="date" id="startDate" class="form-control form-control-sm" 
-                                               onchange="updateCustomDateRange()">
-                                        <span class="text-muted">to</span>
-                                        <input type="date" id="endDate" class="form-control form-control-sm" 
-                                               onchange="updateCustomDateRange()">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body p-4">
-                            <div style="height: 400px;">
-                                <canvas id="salesChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="row">
                     <div class="col-md-12 px-4 mb-4">
                         <div id="sales-insights"></div>
@@ -193,83 +107,18 @@
                 <div class="col-md-12 px-4">
                     <div class="container">
                         <!-- Pending Orders Header -->
-                        <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4"S>
                             <div class="d-flex align-items-center">
                                 <i class="fas fa-clock text-warning me-2 fs-4"></i>
                                 <h4 class="mb-0 text-primary fw-bold">Pending Orders</h4>
                             </div>
-                            <div class="badge bg-warning text-ligt px-3 py-2">
+                            <div class="badge bg-warning text-light px-3 py-2">
                                 <i class="fas fa-info-circle me-1"></i>
-                                Showing orders from the last 3 days
+                                Showing pending orders from the last 3 days
                             </div>
                         </div>
-                        <div class="row g-4">
-                            <!-- Total Orders Cards -->
-                            <div class="col-md-4">
-                                <div class="order-card shadow-sm rounded-3 p-4 h-100" onclick="showOrderSummaryByDate('Ryzen')">
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h5 class="card-title fw-bold mb-0">
-                                            <i class="fas fa-calendar-day me-2"></i>
-                                        </h5>
-                                        <span class="badge bg-primary"></span>
-                                    </div>
-                                    <div class="order-items">
-                                        <div class="order-item d-flex align-items-center mb-2">
-                                            <i class="fas fa-user-circle me-2"></i>
-                                            <span class="fw-bold text-primary"></span>
-                                        </div>
-                                        <div class="order-detail ms-4 mb-2">
-                                            <p class="mb-1"><i class="fas fa-drumstick-bite me-2"></i></p>
-                                            <p class="mb-1"><i class="fas fa-utensils me-2"></i></p>
-                                            <p class="mb-1"><i class="fas fa-box me-2"></i></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="order-card shadow-sm rounded-3 p-4 h-100" onclick="showOrderSummaryByDate('Jane')">
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h5 class="card-title fw-bold mb-0">
-                                            <i class="fas fa-calendar-day me-2"></i>
-                                        </h5>
-                                        <span class="badge bg-primary"></span>
-                                    </div>
-                                    <div class="order-items">
-                                        <div class="order-item d-flex align-items-center mb-2">
-                                            <i class="fas fa-user-circle me-2"></i>
-                                            <span class="fw-bold text-primary"></span>
-                                        </div>
-                                        <div class="order-detail ms-4 mb-2">
-                                            <p class="mb-1"><i class="fas fa-drumstick-bite me-2"></i></p>
-                                            <p class="mb-1"><i class="fas fa-box me-2"></i></p>
-                                            <p class="mb-1"><i class="fas fa-utensils me-2"></i></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="order-card shadow-sm rounded-3 p-4 h-100" onclick="showOrderSummaryByDate('John')">
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h5 class="card-title fw-bold mb-0">
-                                            <i class="fas fa-calendar-day me-2"></i>
-                                        </h5>
-                                        <span class="badge bg-primary"></span>
-                                    </div>
-                                    <div class="order-items">
-                                        <div class="order-item d-flex align-items-center mb-2">
-                                            <i class="fas fa-user-circle me-2"></i>
-                                            <span class="fw-bold text-primary"></span>
-                                        </div>
-                                        <div class="order-detail ms-4 mb-2">
-                                            <p class="mb-1"><i class="fas fa-drumstick-bite me-2"></i></p>
-                                            <p class="mb-1"><i class="fas fa-box me-2"></i></p>
-                                            <p class="mb-1"><i class="fas fa-utensils me-2"></i></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="row g-4" id="pendingOrdersContainer">
+                            <!-- Pending orders will be populated here -->
                         </div>
                     </div>
                 </div>
@@ -312,26 +161,37 @@
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/ai-insights.js"></script>
     <script>
         // API URL
         const API_URL = 'http://localhost:4000/api';
 
-        // Fetch orders from backend
+        // Fetch pending orders
         async function fetchOrders() {
             try {
-                // First fetch all orders
-                console.log('Fetching all orders from:', `${API_URL}/orders`);
-                
-                const response = await fetch(`${API_URL}/orders`);
+                console.log('Fetching orders...');
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    throw new Error('No authentication token found');
+                }
+
+                // Remove the include=products parameter since the backend already populates product details
+                const response = await fetch(`${API_URL}/orders`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                
                 const orders = await response.json();
-                
-                console.log('All orders:', orders);
-                
+                console.log('Received orders:', orders); // This will help debug the response
+
                 // Filter orders for last 3 days and pending status
                 const today = new Date();
                 today.setHours(23, 59, 59, 999);
@@ -340,538 +200,211 @@
                 threeDaysAgo.setDate(today.getDate() - 2);
                 threeDaysAgo.setHours(0, 0, 0, 0);
 
-                const filteredOrders = orders.filter(order => {
+                const pendingOrders = orders.filter(order => {
                     const orderDate = new Date(order.orderDate);
-                    const isInDateRange = orderDate >= threeDaysAgo && orderDate <= today;
-                    
-                    // Log each order's status for debugging
-                    console.log('Order:', {
-                        id: order.id,
-                        date: orderDate,
-                        status: order.status,
-                        isInDateRange,
-                        isPending: order.status?.toLowerCase() === 'pending'
-                    });
-                    
-                    return isInDateRange && order.status?.toLowerCase() === 'pending';
+                    return orderDate >= threeDaysAgo && 
+                           orderDate <= today && 
+                           order.status.toLowerCase() === 'pending';
                 });
 
-                console.log('Filtered orders:', filteredOrders);
-                console.log('Date range:', { threeDaysAgo, today });
+                // Add this debug log to check the filtered orders
+                console.log('Pending orders:', pendingOrders);
 
-                displayOrders(filteredOrders);
+                // Group orders by date
+                const groupedOrders = groupOrdersByDate(pendingOrders);
+                displayPendingOrders(groupedOrders);
+
             } catch (error) {
                 console.error('Error fetching orders:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Failed to load orders. Please try again.'
+                    text: 'Failed to load pending orders: ' + error.message
                 });
             }
         }
 
-        // Display orders in cards
-        function displayOrders(orders) {
-            const container = document.querySelector('.row.g-4');
-            
-            if (!orders || orders.length === 0) {
-                container.innerHTML = '<div class="col-12"><p class="text-center text-light">No pending orders found</p></div>';
+        // Group orders by date
+        function groupOrdersByDate(orders) {
+            const groups = {};
+            orders.forEach(order => {
+                const date = new Date(order.orderDate).toISOString().split('T')[0];
+                if (!groups[date]) {
+                    groups[date] = [];
+                }
+                groups[date].push(order);
+            });
+            return groups;
+        }
+
+        // Display pending orders
+        function displayPendingOrders(groupedOrders) {
+            const container = document.getElementById('pendingOrdersContainer');
+            container.innerHTML = '';
+
+            if (Object.keys(groupedOrders).length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No pending orders found for the last 3 days
+                        </div>
+                    </div>
+                `;
                 return;
             }
 
-            // Group orders by date
-            const groupedOrders = orders.reduce((groups, order) => {
-                const date = new Date(order.orderDate);
-                const dateKey = date.toISOString().split('T')[0];
-                
-                if (!groups[dateKey]) {
-                    groups[dateKey] = {
-                        date: date,
-                        orders: []
-                    };
-                }
-                groups[dateKey].orders.push(order);
-                return groups;
-            }, {});
+            // Sort dates in descending order
+            const sortedDates = Object.keys(groupedOrders).sort().reverse();
 
-            // Sort dates in descending order and take only the last 3 days
-            const sortedDates = Object.values(groupedOrders)
-                .sort((a, b) => b.date - a.date)
-                .slice(0, 3);
-
-            container.innerHTML = sortedDates.map(({ date, orders }) => {
-                const formattedDate = date.toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    day: 'numeric', 
-                    year: 'numeric' 
+            sortedDates.forEach(date => {
+                const orders = groupedOrders[date];
+                const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'short',
+                    day: 'numeric'
                 });
-                const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
 
-                return `
+                container.innerHTML += `
                     <div class="col-md-4">
-                        <div class="order-card shadow-sm rounded-3 p-4 h-100" onclick="showOrderSummaryByDate('${date.toISOString().split('T')[0]}')">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="card-title fw-bold mb-0">
-                                    <i class="fas fa-calendar-day me-2"></i>${formattedDate}
-                                </h5>
-                                <span class="badge bg-primary">${dayOfWeek}</span>
-                            </div>
-                            <div class="order-items">
-                                <div class="order-item d-flex align-items-center mb-2">
-                                    <i class="fas fa-users me-2"></i>
-                                    <span class="fw-bold text-primary">${orders.length} Pending Orders</span>
+                        <div class="card shadow-sm" onclick="showDayOrderSummary('${date}', ${JSON.stringify(orders).replace(/'/g, "\\'").replace(/"/g, '&quot;')})">
+                            <div class="card-header bg-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-calendar-day me-2"></i>${formattedDate}
+                                    </h5>
+                                    <span class="badge bg-warning text-dark">
+                                        ${orders.length} Orders
+                                    </span>
                                 </div>
-                                <div class="order-detail ms-4 mb-2">
-                                    ${orders.slice(0, 3).map(order => `
-                                        <p class="mb-1">
-                                            <i class="fas fa-user me-2"></i>${order.customerName || 'Unknown Customer'}
-                                        </p>
+                            </div>
+                            <div class="card-body" style="min-height: 150px; max-height: 300px; overflow-y: auto;">
+                                <div class="order-list">
+                                    ${orders.map(order => `
+                                        <div class="order-item mb-3 p-2 border-bottom">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <i class="fas fa-user-circle text-primary me-2"></i>
+                                                <span class="fw-bold">${order.customerName}</span>
+                                            </div>
+                                            <div class="ms-4">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock me-1"></i>${order.orderTime || 'N/A'}
+                                                </small>
+                                                <div class="mt-1">
+                                                    ${order.orderDetails.map(detail => `
+                                                        <div class="text-truncate">
+                                                            <i class="fas fa-utensils me-1"></i>
+                                                            ${detail.price ? `Item (₱${detail.price})` : 'Unknown Item'} x${detail.quantity || 1}
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        </div>
                                     `).join('')}
-                                    ${orders.length > 3 ? `
-                                        <p class="mb-1 text-primary">
-                                            <i class="fas fa-plus-circle me-2"></i>${orders.length - 3} more orders...
-                                        </p>
-                                    ` : ''}
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
-            }).join('');
+            });
         }
 
-        // Updated showOrderSummaryByDate function
-        async function showOrderSummaryByDate(dateString) {
-            try {
-                const response = await fetch(`${API_URL}/orders`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const allOrders = await response.json();
-                
-                // Filter orders for the selected date
-                const ordersForDate = allOrders.filter(order => {
-                    try {
-                        return order.orderDate.split('T')[0] === dateString;
-                    } catch (error) {
-                        console.warn('Invalid date in order:', order);
-                        return false;
+        // Show day order summary
+        function showDayOrderSummary(date, orders) {
+            // Calculate total ingredients needed for all orders
+            const ingredientTotals = {};
+            
+            orders.forEach(order => {
+                order.orderDetails.forEach(detail => {
+                    if (detail.product && Array.isArray(detail.product.ingredients)) {
+                        detail.product.ingredients.forEach(ingredient => {
+                            const quantity = detail.quantity || 1;
+                            if (ingredientTotals[ingredient]) {
+                                ingredientTotals[ingredient] += quantity;
+                            } else {
+                                ingredientTotals[ingredient] = quantity;
+                            }
+                        });
                     }
                 });
+            });
 
-                // Update modal content
-                const modal = new bootstrap.Modal(document.getElementById('orderSummaryModal'));
-                
-                // Update order items section
-                const orderItemsList = document.querySelector('.order-items-list');
-                orderItemsList.innerHTML = ordersForDate.map(order => `
-                    <div class="order-item mb-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="fas fa-user-circle me-2"></i>
-                            <span class="fw-bold">${order.customerName}</span>
-                        </div>
-                        <div class="ms-4">
-                            ${order.orderDetails.map(detail => `
-                                <p class="mb-1">
-                                    <i class="fas fa-utensils me-2"></i>
-                                    ${detail.product.productName} x${detail.quantity || 1}
-                                    <span class="text-muted">- ₱${detail.price}</span>
-                                </p>
-                            `).join('')}
-                            <p class="text-end mb-1 fw-bold">Total: ₱${order.totalAmount}</p>
-                        </div>
-                    </div>
-                `).join('');
+            // Format the date
+            const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric'
+            });
 
-                // Calculate total ingredients needed
-                const ingredientTotals = {};
-                ordersForDate.forEach(order => {
-                    (order.orderDetails || []).forEach(detail => {
-                        if (detail.product && Array.isArray(detail.product.ingredients)) {
-                            detail.product.ingredients.forEach(ingredient => {
-                                const ingredientName = typeof ingredient === 'string' ? ingredient : ingredient.name;
-                                
-                                if (ingredientTotals[ingredientName]) {
-                                    ingredientTotals[ingredientName].quantity += detail.quantity || 1;
-                                } else {
-                                    ingredientTotals[ingredientName] = {
-                                        quantity: detail.quantity || 1,
-                                        products: [detail.product.productName]
-                                    };
-                                }
-                            });
-                        }
-                    });
-                });
-
-                // Helper function to get appropriate icon for ingredient
-                function getIngredientIcon(ingredientName) {
-                    const name = ingredientName.toLowerCase();
-                    if (name.includes('chicken')) return 'fa-drumstick-bite';
-                    if (name.includes('pork')) return 'fa-bacon';
-                    if (name.includes('beef')) return 'fa-cow';
-                    if (name.includes('shrimp')) return 'fa-shrimp';
-                    if (name.includes('fish')) return 'fa-fish';
-                    if (name.includes('noodles') || name.includes('pasta')) return 'fa-wheat-awn';
-                    if (name.includes('sauce') || name.includes('vinegar')) return 'fa-bottle-droplet';
-                    if (name.includes('oil')) return 'fa-oil-can';
-                    if (name.includes('garlic') || name.includes('onion')) return 'fa-seedling';
-                    if (name.includes('pepper') || name.includes('spice')) return 'fa-pepper-hot';
-                    if (name.includes('vegetables') || name.includes('cabbage') || name.includes('carrot')) return 'fa-carrot';
-                    if (name.includes('fruit') || name.includes('calamansi') || name.includes('lemon')) return 'fa-lemon';
-                    return 'fa-utensils'; // default icon
-                }
-
-                // Update ingredients section with appropriate icons
-                const ingredientsList = document.querySelector('.ingredients-list');
-                if (Object.keys(ingredientTotals).length > 0) {
-                    ingredientsList.innerHTML = Object.entries(ingredientTotals).map(([name, details]) => `
-                        <div class="ingredient-item mb-2">
-                            <i class="fas fa-carrot me-2"></i>
-                            <span class="fw-bold">${name}</span>
-                            <div class="ms-4">
-                                <small class="text-muted">
-                                    Required for: ${details.products.join(', ')}
-                                    (${details.quantity} order${details.quantity > 1 ? 's' : ''})
-                                </small>
+            // Create the modal content
+            const modalContent = `
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-calendar-day me-2"></i>
+                        Pending Orders Summary - ${formattedDate}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold mb-3">
+                                <i class="fas fa-list me-2"></i>Orders (${orders.length})
+                            </h6>
+                            <div class="order-list">
+                                ${orders.map(order => `
+                                    <div class="order-item mb-3 p-3 border rounded">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-bold">${order.customerName}</span>
+                                            <small class="text-muted">${order.orderTime || 'N/A'}</small>
+                                        </div>
+                                        <div class="products-list">
+                                            ${order.orderDetails.map(detail => `
+                                                <div class="product-item">
+                                                    <i class="fas fa-utensils me-2"></i>
+                                                    ${detail.product ? detail.product.productName : 'Unknown Product'} x${detail.quantity || 1}
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
                             </div>
                         </div>
-                    `).join('');
-                } else {
-                    ingredientsList.innerHTML = '<p>No ingredients data available</p>';
-                }
-                
-                modal.show();
-            } catch (error) {
-                console.error('Error in showOrderSummaryByDate:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Failed to load order details. Please try again.'
-                });
-            }
+                        <div class="col-md-6">
+                            <h6 class="fw-bold mb-3">
+                                <i class="fas fa-shopping-basket me-2"></i>Total Ingredients Needed
+                            </h6>
+                            <div class="ingredients-list">
+                                ${Object.entries(ingredientTotals).map(([ingredient, quantity]) => `
+                                    <div class="ingredient-item d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
+                                        <div>
+                                            <i class="fas fa-carrot me-2"></i>
+                                            ${ingredient}
+                                        </div>
+                                        <span class="badge bg-primary">${quantity} units</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            `;
+
+            // Update and show the modal
+            const modal = document.getElementById('orderSummaryModal');
+            modal.querySelector('.modal-content').innerHTML = modalContent;
+            new bootstrap.Modal(modal).show();
         }
 
-        // Add Sales Chart Functions
-        let salesChart = null;
-
-        async function fetchSalesData(period = 'week', customStartDate = null, customEndDate = null) {
-            try {
-                const endDate = customEndDate ? new Date(customEndDate) : new Date();
-                let startDate;
-
-                if (customStartDate) {
-                    startDate = new Date(customStartDate);
-                } else {
-                    startDate = new Date();
-                    if (period === 'week') {
-                        startDate.setDate(endDate.getDate() - 7);
-                    } else if (period === 'month') {
-                        startDate.setDate(1); // Start from beginning of month
-                    }
-                }
-
-                // Set time to start of day for start date and end of day for end date
-                startDate.setHours(0, 0, 0, 0);
-                endDate.setHours(23, 59, 59, 999);
-
-                console.log('Date range:', { startDate, endDate });
-
-                // Get the authentication token from localStorage
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    throw new Error('No authentication token found');
-                }
-
-                const response = await fetch(`${API_URL}/sales`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        window.location.href = '/frontend/login.html';
-                        throw new Error('Please login to view sales data');
-                    }
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const salesData = await response.json();
-                console.log('Raw sales data:', salesData);
-                
-                // Process sales data
-                const dailySales = {};
-                
-                // Initialize all dates in the range with 0
-                let currentDate = new Date(startDate);
-                while (currentDate <= endDate) {
-                    const dateKey = currentDate.toISOString().split('T')[0];
-                    dailySales[dateKey] = 0;
-                    currentDate.setDate(currentDate.getDate() + 1);
-                }
-
-                // Aggregate sales by date
-                salesData.data.forEach(sale => {
-                    const saleDate = new Date(sale.saleDate);
-                    saleDate.setHours(0, 0, 0, 0); // Normalize to start of day
-                    
-                    if (saleDate >= startDate && saleDate <= endDate) {
-                        const dateKey = saleDate.toISOString().split('T')[0];
-                        if (dailySales[dateKey] === undefined) {
-                            dailySales[dateKey] = 0;
-                        }
-                        dailySales[dateKey] += sale.totalAmount;
-                        console.log(`Adding sale for ${dateKey}: ${sale.totalAmount} (Total: ${dailySales[dateKey]})`);
-                    }
-                });
-
-                console.log('Processed daily sales:', dailySales);
-
-                // Create arrays for chart
-                const dates = Object.keys(dailySales).sort();
-                const amounts = dates.map(date => dailySales[date]);
-
-                return {
-                    labels: dates.map(date => new Date(date).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric'
-                    })),
-                    data: amounts
-                };
-            } catch (error) {
-                console.error('Error fetching sales data:', error);
-                if (error.message === 'No authentication token found') {
-                    window.location.href = '/frontend/login.html';
-                }
-                throw error;
-            }
-        }
-
-        async function updateSalesChart(period = 'week', customStartDate = null, customEndDate = null) {
-            try {
-                // Update button states
-                const weekBtn = document.querySelector('button[onclick="updateSalesChart(\'week\')"]');
-                const monthBtn = document.querySelector('button[onclick="updateSalesChart(\'month\')"]');
-                
-                if (!customStartDate && !customEndDate) {
-                    if (period === 'week') {
-                        weekBtn.classList.add('active', 'btn-primary');
-                        weekBtn.classList.remove('btn-outline-primary');
-                        monthBtn.classList.remove('active', 'btn-primary');
-                        monthBtn.classList.add('btn-outline-primary');
-                    } else {
-                        monthBtn.classList.add('active', 'btn-primary');
-                        monthBtn.classList.remove('btn-outline-primary');
-                        weekBtn.classList.remove('active', 'btn-primary');
-                        weekBtn.classList.add('btn-outline-primary');
-                    }
-                } else {
-                    // Remove active state from both buttons when using custom range
-                    weekBtn.classList.remove('active', 'btn-primary');
-                    monthBtn.classList.remove('active', 'btn-primary');
-                    weekBtn.classList.add('btn-outline-primary');
-                    monthBtn.classList.add('btn-outline-primary');
-                }
-
-                const { labels, data } = await fetchSalesData(period, customStartDate, customEndDate);
-
-                if (salesChart) {
-                    salesChart.destroy();
-                }
-
-                const ctx = document.getElementById('salesChart').getContext('2d');
-                
-                // Create gradient
-                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                gradient.addColorStop(0, 'rgba(78, 115, 223, 0.2)');
-                gradient.addColorStop(1, 'rgba(78, 115, 223, 0)');
-
-                salesChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Daily Sales',
-                            data: data,
-                            borderColor: '#4e73df',
-                            backgroundColor: gradient,
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: '#4e73df',
-                            pointBorderColor: '#ffffff',
-                            pointHoverBackgroundColor: '#ffffff',
-                            pointHoverBorderColor: '#4e73df',
-                            pointBorderWidth: 2,
-                            pointHoverBorderWidth: 3,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                backgroundColor: '#ffffff',
-                                titleColor: '#000000',
-                                bodyColor: '#000000',
-                                bodyFont: {
-                                    size: 14
-                                },
-                                titleFont: {
-                                    size: 16,
-                                    weight: 'bold'
-                                },
-                                padding: 12,
-                                borderColor: '#e3e6f0',
-                                borderWidth: 1,
-                                displayColors: false,
-                                callbacks: {
-                                    title: function(context) {
-                                        return context[0].label;
-                                    },
-                                    label: function(context) {
-                                        return '₱' + context.parsed.y.toLocaleString(undefined, {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        });
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                grid: {
-                                    display: false
-                                },
-                                ticks: {
-                                    font: {
-                                        size: 12
-                                    }
-                                }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: '#e3e6f0',
-                                    drawBorder: false
-                                },
-                                ticks: {
-                                    font: {
-                                        size: 12
-                                    },
-                                    padding: 10,
-                                    callback: function(value) {
-                                        return '₱' + value.toLocaleString(undefined, {
-                                            minimumFractionDigits: 0,
-                                            maximumFractionDigits: 0
-                                        });
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('Error updating sales chart:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Failed to load sales data. Please try again.'
-                });
-            }
-        }
-
-        function updateCustomDateRange() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-
-            if (startDate && endDate) {
-                if (new Date(startDate) > new Date(endDate)) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Invalid Date Range',
-                        text: 'Start date cannot be after end date'
-                    });
-                    return;
-                }
-                updateSalesChart('custom', startDate, endDate);
-            }
-        }
-
-        // Initialize date inputs with default values
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date();
-            const lastWeek = new Date(today);
-            lastWeek.setDate(today.getDate() - 7);
-
-            document.getElementById('startDate').value = lastWeek.toISOString().split('T')[0];
-            document.getElementById('endDate').value = today.toISOString().split('T')[0];
-
             fetchOrders();
-            updateSalesChart('week');
-        });
-
-        // Fetch sales insights
-        async function fetchSalesInsights() {
-            try {
-                const response = await fetch(`${API_URL}/ai/analyze-sales?startDate=2023-01-01&endDate=2023-12-31`);
-                const data = await response.json();
-                if (data.success) {
-                    console.log('Sales Insights:', data.data);
-                    // Display insights on the dashboard
-                }
-            } catch (error) {
-                console.error('Error fetching sales insights:', error);
-            }
-        }
-
-        // Fetch order predictions
-        async function fetchOrderPredictions(orderId) {
-            try {
-                const response = await fetch(`${API_URL}/ai/analyze-order/${orderId}`);
-                const data = await response.json();
-                if (data.success) {
-                    console.log('Order Predictions:', data.data);
-                    // Display predictions on the order page
-                }
-            } catch (error) {
-                console.error('Error fetching order predictions:', error);
-            }
-        }
-
-        // Fetch transaction anomalies
-        async function fetchTransactionAnomalies() {
-            try {
-                const response = await fetch(`${API_URL}/ai/detect-anomalies?startDate=2023-01-01&endDate=2023-12-31`);
-                const data = await response.json();
-                if (data.success) {
-                    console.log('Transaction Anomalies:', data.data);
-                    // Display anomalies on the transaction page
-                }
-            } catch (error) {
-                console.error('Error fetching transaction anomalies:', error);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchSalesInsights();
-            fetchTransactionAnomalies();
-        });
-
-        // Initialize AI Insights
-        document.addEventListener('DOMContentLoaded', async () => {
-            const aiInsights = new AIInsights(API_URL);
-            await aiInsights.initialize();
         });
     </script>
 </body>
-
 </html>
 
+ 

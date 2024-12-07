@@ -1,51 +1,27 @@
 const mongoose = require('mongoose');
 
 const saleSchema = new mongoose.Schema({
-    transactionId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Transaction',
-        required: true
+    date: {
+        type: Date,
+        required: true,
+        default: Date.now
     },
-    totalAmount: {
+    amount: {
         type: Number,
         required: true
     },
-    items: [{
-        productId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Product',
-            required: true
-        },
-        quantity: {
-            type: Number,
-            required: true
-        },
-        unitPrice: {
-            type: Number,
-            required: true
-        },
-        subtotal: {
-            type: Number,
-            required: true
-        }
-    }],
-    saleDate: {
-        type: Date,
-        default: Date.now
+    orderId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Order'
     },
-    paymentStatus: {
-        type: String,
-        enum: ['Pending', 'Completed', 'Refunded', 'Failed'],
-        default: 'Pending'
-    },
-    salesPerson: {
+    paymentMethod: {
         type: String,
         required: true
     },
-    customerDetails: {
-        name: String,
-        contact: String,
-        email: String
+    status: {
+        type: String,
+        enum: ['Completed', 'Pending', 'Failed'],
+        default: 'Completed'
     }
 }, {
     timestamps: true

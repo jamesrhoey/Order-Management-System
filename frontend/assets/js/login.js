@@ -1,4 +1,4 @@
-document.getElementById('loginForm').addEventListener('submit', async function(e) {
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const username = document.getElementById('username').value;
@@ -14,28 +14,38 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         });
 
         const data = await response.json();
-        
-        if (response.ok) {
-            // Clear any existing data
-            localStorage.clear();
-            
-            // Store the JWT token and user data
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
 
-            // Use setTimeout to prevent rapid navigation
-            setTimeout(() => {
-                window.location.href = '/frontend/index.html';
-            }, 100);
-        } else {
+        if (!response.ok) {
             throw new Error(data.message || 'Login failed');
         }
+
+        // Store token and user info in localStorage
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify({
+            id: data.user.id,
+            username: data.user.username
+        }));
+
+        console.log('Authentication Token:', data.token);
+        console.log('User Data:', data.user);
+
+        // Show success message
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: 'Login successful',
+            timer: 1000,
+            showConfirmButton: false
+        }).then(() => {
+            // Redirect to dashboard
+            window.location.href = 'index.html';
+        });
+
     } catch (error) {
-        console.error('Login error:', error);
         Swal.fire({
             icon: 'error',
             title: 'Login Failed',
-            text: error.message || 'An error occurred during login'
+            text: error.message
         });
     }
 });
@@ -64,20 +74,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100);
     }
 });
-
-function handleLogin(event) {
-    event.preventDefault();
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-
-    if (username === 'admin' && password === 'admin') {
-        localStorage.setItem('token', 'dummy-token'); // Simulate login
-        window.location.href = 'index.html';
-    } else {
-        Swal.fire({
-            icon: 'error',
-            title: 'Login Failed',
-            text: 'Invalid username or password'
-        });
-    }
-}

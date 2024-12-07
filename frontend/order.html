@@ -297,32 +297,52 @@ async function loadOrders() {
         const dateFilter = document.getElementById('orderDateFilter').value;
         let url = 'http://localhost:4000/api/orders';
         
-        // Always include date filter in URL
         if (dateFilter) {
             url += `?date=${dateFilter}`;
-        } else {
-            // If no date is selected, use today's date
-            const today = new Date().toISOString().split('T')[0];
-            url += `?date=${today}`;
-            document.getElementById('orderDateFilter').value = today; // Set date picker to today
         }
         
-        const response = await fetch(url);
+        // Get the token from localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+            // Redirect to login if no token
+            window.location.href = '/frontend/login.html';
+            return;
+        }
+        
+        console.log('Fetching orders from:', url); // Debug log
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.status === 401) {
+            // Token expired or invalid
+            localStorage.removeItem('token');
+            window.location.href = '/frontend/login.html';
+            return;
+        }
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const orders = await response.json();
+        console.log('Received orders:', orders); // Debug log
+        
         const userDetailsTable = document.getElementById('userDetails');
         userDetailsTable.innerHTML = '';
 
         // If no orders found, show message
-        if (orders.length === 0) {
+        if (!orders || orders.length === 0) {
             userDetailsTable.innerHTML = `
                 <tr>
                     <td colspan="8" class="text-center py-4">
                         <i class="fa fa-info-circle me-2"></i>
-                        ${dateFilter ? 'No orders found for selected date' : 'No orders found for today'}
+                        ${dateFilter ? 'No orders found for selected date' : 'No orders found'}
                     </td>
                 </tr>
             `;
@@ -330,43 +350,44 @@ async function loadOrders() {
         }
 
         orders.forEach((order, index) => {
-            const orderDetails = (order.orderDetails || [])
-                .map(detail => {
-                    const productName = detail.product ? detail.product.productName : 'Unknown Product';
-                    return productName;
-                })
-                .filter(name => name)
+            // Format the date and time
+            const orderDate = order.orderDate ? new Date(order.orderDate).toLocaleDateString() : 'N/A';
+            const orderTime = order.orderTime || 'N/A';
+            
+            // Get product details
+            const orderDetails = order.orderDetails
+                .map(detail => detail.product ? detail.product.productName : 'Unknown Product')
                 .join(', ');
 
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td class="fw-bold">${index + 1}</td>
+                <td class="fw-bold">${order._id.slice(-4)}</td>
                 <td>
                     <div class="d-flex align-items-center" style="max-width: 200px;">
                         <div class="d-flex align-items-center gap-2 text-start">
                             <i class="fas fa-user-circle text-primary" style="font-size: 1.5rem;"></i>
-                            <div class="text-truncate" style="max-width: 150px;" title="${order.customerName || 'N/A'}">
-                                ${order.customerName || 'N/A'}
+                            <div class="text-truncate" style="max-width: 150px;" title="${order.customerName}">
+                                ${order.customerName}
                             </div>
                         </div>
                     </div>
                 </td>
-                <td>${order.orderDate || 'N/A'}</td>
-                <td>${order.orderTime || 'N/A'}</td>
+                <td>${orderDate}</td>
+                <td>${orderTime}</td>
                 <td>
                     <span class="badge ${getPaymentMethodBadgeClass(order.paymentMethod)}">
-                        ${order.paymentMethod || 'N/A'}
+                        ${order.paymentMethod}
                     </span>
                 </td>
                 <td>
                     <a href="#" class="text-primary text-decoration-none" 
-                       onclick="viewOrderDetails('${order._id}', \`${orderDetails}\`, \`${order.notes || ''}\`, \`${order.deliveryAddress || 'N/A'}\`, \`${order.contactNumber || 'N/A'}\`)">
+                       onclick="viewOrderDetails('${order._id}', \`${orderDetails}\`, \`${order.notes || ''}\`, \`${order.deliveryAddress}\`, \`${order.contactNumber}\`)">
                         <i class="fas fa-eye me-1"></i>View Details
                     </a>
                 </td>
                 <td>
                     <span class="badge ${getStatusBadgeClass(order.status)}">
-                        ${order.status || 'Pending'}
+                        ${order.status}
                     </span>
                 </td>
                 <td>
@@ -382,12 +403,17 @@ async function loadOrders() {
         });
     } catch (error) {
         console.error('Error loading orders:', error);
+        if (error.message.includes('401')) {
+            // If unauthorized, redirect to login
+            window.location.href = '/frontend/login.html';
+            return;
+        }
         const userDetailsTable = document.getElementById('userDetails');
         userDetailsTable.innerHTML = `
             <tr>
                 <td colspan="8" class="text-center text-danger">
-                    Failed to load orders. Please try again later.
-                    Error: ${error.message}
+                    <i class="fa fa-exclamation-circle me-2"></i>
+                    Failed to load orders: ${error.message}
                 </td>
             </tr>
         `;
@@ -703,6 +729,13 @@ async function editOrder(orderId) {
 
 // Update the window.onload function
 window.onload = function() {
+    // Check for authentication
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/frontend/login.html';
+        return;
+    }
+
     // Set today's date as default
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('orderDateFilter').value = today;

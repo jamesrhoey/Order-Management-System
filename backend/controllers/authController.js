@@ -1,147 +1,90 @@
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
-const authController = {
-    // Login user
-    login: async (req, res) => {
-        try {
-            const { username, password } = req.body;
-            console.log('Login attempt for username:', username);
-
-            // Find user
-            const user = await User.findOne({ username });
-            if (!user) {
-                return res.status(401).json({
-                    success: false,
-                    message: 'Invalid credentials'
-                });
-            }
-
-            // Check password
-            const isMatch = await user.comparePassword(password);
-            if (!isMatch) {
-                return res.status(401).json({
-                    success: false,
-                    message: 'Invalid credentials'
-                });
-            }
-
-            // Create token with explicit payload
-            const payload = {
-                id: user._id,
-                username: user.username,
-                role: user.role
-            };
-
-            console.log('Creating token with payload:', payload);
-            console.log('Using JWT_SECRET:', process.env.JWT_SECRET);
-
-            const token = jwt.sign(
-                payload,
-                process.env.JWT_SECRET,
-                { expiresIn: '24h' }
-            );
-
-            console.log('Token created successfully:', token);
-
-            // Send response
-            res.json({
-                success: true,
-                token,
-                user: {
-                    id: user._id,
-                    username: user.username,
-                    role: user.role
-                }
-            });
-        } catch (error) {
-            console.error('Login error:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Error during login',
-                error: error.message
-            });
+const register = async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        
+        // Check if user already exists
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            return res.status(400).json({ message: 'Username already exists' });
         }
-    },
 
-    // Register new user
-    register: async (req, res) => {
-        try {
-            const { username, password, role } = req.body;
+        // Create new user
+        const user = new User({
+            username,
+            password // Password will be hashed by the pre-save middleware
+        });
 
-            // Check if user exists
-            const existingUser = await User.findOne({ username });
-            if (existingUser) {
-                return res.status(400).json({ message: 'Username already exists' });
-            }
+        await user.save();
 
-            // Create new user
-            const user = new User({
-                username,
-                password,
-                role: role || 'staff'
-            });
+        // Generate token
+        const token = jwt.sign(
+            { id: user._id, username: user.username },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
 
-            await user.save();
-
-            // Optionally, you might want to automatically log in the user after registration
-            const token = jwt.sign(
-                { id: user._id, role: user.role },
-                process.env.JWT_SECRET,
-                { expiresIn: '1d' }
-            );
-
-            res.status(201).json({ 
-                message: 'User registered successfully',
-                token,
-                user: {
-                    id: user._id,
-                    username: user.username,
-                    role: user.role
-                }
-            });
-
-        } catch (error) {
-            console.error('Registration error:', error);
-            res.status(500).json({ message: 'Server error' });
-        }
-    },
-
-    // Verify token
-    verifyToken: async (req, res) => {
-        try {
-            const token = req.headers.authorization?.split(' ')[1];
-            if (!token) {
-                return res.status(401).json({
-                    success: false,
-                    message: 'No token provided'
-                });
-            }
-
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            res.json({
-                success: true,
-                decoded
-            });
-        } catch (error) {
-            res.status(401).json({
-                success: false,
-                message: 'Token verification failed',
-                error: error.message
-            });
-        }
-    },
-
-    // Logout user
-    logout: async (req, res) => {
-        try {
-            // In a real application, you might want to invalidate the token here
-            res.json({ message: 'Logged out successfully' });
-        } catch (error) {
-            console.error('Logout error:', error);
-            res.status(500).json({ message: 'Server error' });
-        }
+        res.status(201).json({
+            message: 'User registered successfully',
+            token
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
 
-module.exports = authController;
+const login = async (req, res) => {
+    try {
+        const { username, password } = req.body;
+
+        // Find user
+        const user = await User.findOne({ username });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        // Check password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        // Generate token
+        const token = jwt.sign(
+            { id: user._id, username: user.username },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        // Send response with token and user info
+        res.json({
+            message: 'Login successful',
+            token,
+            user: {
+                id: user._id,
+                username: user.username,
+                createdAt: user.createdAt
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const getCurrentUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = {
+    register,
+    login,
+    getCurrentUser
+};

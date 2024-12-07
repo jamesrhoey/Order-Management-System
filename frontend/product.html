@@ -86,10 +86,20 @@
             
             <div class="col">
                 <div class="container-fluid mt-4">
-                    <div class="d-flex justify-content-start mt-5">
+                    <div class="d-flex justify-content-between align-items-center mt-5">
                         <button class="btn btn-add-product" data-bs-toggle="modal" data-bs-target="#addProductModal">
                             <i class="fa fa-plus"></i> Add Product
                         </button>
+                        <div class="d-flex align-items-center">
+                            <label for="categoryFilter" class="me-2">Filter by Category:</label>
+                            <select class="form-select" id="categoryFilter" style="width: auto;">
+                                <option value="">All Categories</option>
+                                <option value="Starters">Starters</option>
+                                <option value="Pasta">Pasta</option>
+                                <option value="Mains">Mains</option>
+                                <option value="Dessert">Dessert</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="row" id="product">
                         <div class="table-responsive mt-4 p-4 wrapper rounded-3 shadow-sm">
@@ -105,12 +115,12 @@
                                 </thead>
                                 <tbody class="text-center" id="userDetails">
                                     <tr>
-                                        <td>1</td>
-                                        <td>Chicken Curry</td>
-                                        <td>150</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
                                         <td>
                                             <div>
-                                                <span>Chicken, Curry Powder, Coconut Milk, Potatoes...</span>
+                                                <span></span>
                                                 <button class="btn btn-text text-dark p-0" data-bs-toggle="modal" data-bs-target="#ingredientsModal" onclick="showIngredients('Chicken, Curry Powder, Coconut Milk, Potatoes, Carrots, Onion, Garlic, Ginger')">See More</button>
                                             </div>
                                         </td>
@@ -119,12 +129,12 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>2</td>
-                                        <td>Menudo</td>
-                                        <td>120</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
                                         <td>
                                             <div>
-                                                <span>Pork, Tomato Sauce, Liver, Potatoes...</span>
+                                                <span></span>
                                                 <button class="btn btn-text text-dark p-0" data-bs-toggle="modal" data-bs-target="#ingredientsModal" onclick="showIngredients('Pork, Tomato Sauce, Liver, Potatoes, Carrots, Bell Peppers, Raisins, Garlic, Onion')">See More</button>
                                             </div>
                                         </td>
@@ -177,12 +187,28 @@
                             <input type="text" class="form-control" id="productName" required>
                         </div>
                         <div class="mb-3">
+                            <label for="productCategory" class="form-label">Category</label>
+                            <select class="form-control" id="productCategory" required>
+                                <option value="">Select a category</option>
+                                <option value="Starters">Starters</option>
+                                <option value="Pasta">Pasta</option>
+                                <option value="Mains">Mains</option>
+                                <option value="Dessert">Dessert</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label for="productPrice" class="form-label">Product Price</label>
                             <input type="number" class="form-control" id="productPrice" required>
                         </div>
                         <div class="mb-3">
-                            <label for="productIngredients" class="form-label">Ingredients</label>
-                            <textarea class="form-control" id="productIngredients" rows="3" required></textarea>
+                            <label for="productIngredients" class="form-label">Ingredients (separate with commas)</label>
+                            <textarea 
+                                class="form-control" 
+                                id="productIngredients" 
+                                rows="3" 
+                                required 
+                                placeholder="Example: Chicken, Rice, Vegetables"
+                            ></textarea>
                         </div>
                         <button type="submit" class="btn btn-success w-100">Add Product</button>
                     </form>

@@ -1,182 +1,139 @@
 const Sale = require('../models/saleModel');
-const Transaction = require('../models/transactionModel');
-const Product = require('../models/productModel');
-const mongoose = require('mongoose');
 
-const saleController = {
-    createSale: async (req, res) => {
-        try {
-            const { 
-                transactionId, 
-                items, 
-                salesPerson, 
-                customerDetails 
-            } = req.body;
-
-            // Calculate total amount
-            const totalAmount = items.reduce((sum, item) => 
-                sum + (item.quantity * item.unitPrice), 0);
-
-            const newSale = new Sale({
-                transactionId,
-                totalAmount,
-                items,
-                salesPerson,
-                customerDetails
-            });
-
-            const savedSale = await newSale.save();
-
-            res.status(201).json({
-                success: true,
-                message: 'Sale created successfully',
-                data: savedSale
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error creating sale',
-                error: error.message
-            });
-        }
-    },
-
-    getSaleById: async (req, res) => {
-        try {
-            const sale = await Sale.findById(req.params.id)
-                .populate('transactionId')
-                .populate('items.productId');
-
-            if (!sale) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Sale not found'
-                });
-            }
-
-            res.json({
-                success: true,
-                data: sale
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: error.message
-            });
-        }
-    },
-
-    getAllSales: async (req, res) => {
-        try {
-            console.log('Getting all sales...');
-            console.log('User making request:', req.user);
-
-            const sales = await Sale.find()
-                .populate('transactionId')
-                .populate('items.productId')
-                .sort({ createdAt: -1 });
-
-            console.log('Number of sales found:', sales.length);
-            console.log('Raw sales data:', JSON.stringify(sales, null, 2));
-            
-            if (sales.length === 0) {
-                return res.status(200).json({
-                    success: true,
-                    message: 'No sales records found',
-                    data: []
-                });
-            }
-
-            res.json({
-                success: true,
-                count: sales.length,
-                data: sales
-            });
-        } catch (error) {
-            console.error('Error in getAllSales:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Error fetching sales',
-                error: error.message
-            });
-        }
-    },
-
-    getSalesByDateRange: async (req, res) => {
-        try {
-            const { startDate, endDate } = req.query;
-            
-            const sales = await Sale.find({
-                saleDate: {
-                    $gte: new Date(startDate),
-                    $lte: new Date(endDate)
-                }
-            }).populate('transactionId')
-              .populate('items.productId');
-
-            res.json({
-                success: true,
-                data: sales
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: error.message
-            });
-        }
-    },
-
-    updateSale: async (req, res) => {
-        try {
-            const updatedSale = await Sale.findByIdAndUpdate(
-                req.params.id,
-                req.body,
-                { new: true }
-            ).populate('transactionId')
-             .populate('items.productId');
-
-            if (!updatedSale) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Sale not found'
-                });
-            }
-
-            res.json({
-                success: true,
-                message: 'Sale updated successfully',
-                data: updatedSale
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: error.message
-            });
-        }
-    },
-
-    deleteSale: async (req, res) => {
-        try {
-            const sale = await Sale.findByIdAndDelete(req.params.id);
-
-            if (!sale) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Sale not found'
-                });
-            }
-
-            res.json({
-                success: true,
-                message: 'Sale deleted successfully'
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: error.message
-            });
-        }
+// Get all sales
+const getAllSales = async (req, res) => {
+    try {
+        const sales = await Sale.find().sort({ date: -1 });
+        res.json(sales);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
 
-module.exports = saleController;
+// Get sales by date range
+const getSalesByDateRange = async (req, res) => {
+    try {
+        const { startDate, endDate } = req.query;
+        
+        // Create date objects and set time to start and end of day
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+
+        const sales = await Sale.find({
+            saleDate: {
+                $gte: start,
+                $lte: end
+            }
+        }).sort({ saleDate: -1 });
+
+        // Transform the response to match the expected format
+        const transformedSales = sales.map(sale => ({
+            _id: sale._id,
+            transactionId: sale.transactionId,
+            totalAmount: sale.totalAmount,
+            customerDetails: {
+                name: sale.customerDetails?.name || 'N/A',
+                address: sale.customerDetails?.address || 'N/A',
+                contactNumber: sale.customerDetails?.contactNumber || 'N/A'
+            },
+            items: sale.items.map(item => ({
+                productId: item.productId,
+                quantity: item.quantity,
+                unitPrice: item.unitPrice,
+                subtotal: item.subtotal
+            })),
+            saleDate: sale.saleDate,
+            salesPerson: sale.salesPerson || 'System'
+        }));
+
+        res.json(transformedSales);
+    } catch (error) {
+        console.error('Error in getSalesByDateRange:', error);
+        res.status(500).json({ 
+            message: error.message,
+            details: 'Error fetching sales by date range'
+        });
+    }
+};
+
+// Get sales summary
+const getSalesSummary = async (req, res) => {
+    try {
+        const { startDate, endDate } = req.query;
+        
+        let matchStage = {};
+        
+        // Add date filtering if dates are provided
+        if (startDate && endDate) {
+            const start = new Date(startDate);
+            start.setHours(0, 0, 0, 0);
+            
+            const end = new Date(endDate);
+            end.setHours(23, 59, 59, 999);
+            
+            matchStage = {
+                saleDate: {
+                    $gte: start,
+                    $lte: end
+                }
+            };
+        }
+
+        const summary = await Sale.aggregate([
+            { $match: matchStage },
+            {
+                $group: {
+                    _id: null,
+                    totalSales: { $sum: '$totalAmount' },
+                    averageSale: { $avg: '$totalAmount' },
+                    totalTransactions: { $sum: 1 },
+                    totalItems: { $sum: { $size: '$items' } }
+                }
+            }
+        ]);
+
+        // Provide default values if no sales found
+        const defaultSummary = {
+            totalSales: 0,
+            averageSale: 0,
+            totalTransactions: 0,
+            totalItems: 0
+        };
+
+        res.json(summary[0] || defaultSummary);
+    } catch (error) {
+        console.error('Error in getSalesSummary:', error);
+        res.status(500).json({ 
+            message: error.message,
+            details: 'Error generating sales summary'
+        });
+    }
+};
+
+// Create new sale
+const createSale = async (req, res) => {
+    try {
+        const sale = new Sale({
+            ...req.body,
+            saleDate: new Date() // Ensure saleDate is set to current time
+        });
+        const newSale = await sale.save();
+        res.status(201).json(newSale);
+    } catch (error) {
+        console.error('Error in createSale:', error);
+        res.status(400).json({ 
+            message: error.message,
+            details: 'Error creating sale record'
+        });
+    }
+};
+
+module.exports = {
+    getAllSales,
+    getSalesByDateRange,
+    getSalesSummary,
+    createSale
+};
