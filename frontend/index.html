@@ -6,159 +6,405 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
     <title>Home</title>
-    <link rel="stylesheet" href="assets/css/style.css?v=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
     <div class="container-fluid">
         <div class="row flex-nowrap">
             <!-- Sidebar -->
-            <div class="bg-dark col-auto min-vh-100 d-flex flex-column justify-content-between">
-                <div class="bg-dark p-2">
+            <div class="sidebar col-auto min-vh-100 d-flex flex-column justify-content-between">
+                <div class="p-2">
                     <a href="" class="d-flex text-decoration-none mt-1 align-items-center text-white">
-                        <span>TINDAHAN NI RYZEN</span>
+                        <div class="logo-container me-3">
+                            <div class="logo-icon-wrapper">
+                                <i class="fas fa-bolt logo-icon-accent"></i>
+                                <i class="fas fa-shopping-basket logo-icon-main"></i>
+                            </div>
+                        </div>
+                        <div class="brand-text">
+                            <span class="brand-name">Simpli<span class="text-accent">Serve</span></span>
+                        </div>
                     </a>
                     <ul class="nav nav-pills flex-column mt-4">
                         <li class="nav-item py-2 py-sm-0">
                             <a href="index.html" class="nav-link active text-white">
-                                <i class="fa fa-gauge"></i><span class="fs-5 ms-3 d-none d-sm-inline">Dashboard</span>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-chart-line icon-main"></i>
+                                        <i class="fas fa-circle icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3 d-none d-sm-inline">Dashboard</span>
+                                </div>
                             </a>
                         </li>
                         <li class="nav-item py-2 py-sm-0">
                             <a href="order.html" class="nav-link text-white">
-                                <i class="fa fa-clipboard" style="color: #ffffff;"></i><span class="fs-5 ms-3 d-none d-sm-inline">Orders</span>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-shopping-bag icon-main"></i>
+                                        <i class="fas fa-plus icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3 d-none d-sm-inline">Orders</span>
+                                </div>
                             </a>
                         </li>
                         <li class="nav-item py-2 py-sm-0">
                             <a href="product.html" class="nav-link text-white">
-                                <i class="fa fa-table-list" style="color: #ffffff;"></i><span class="fs-5 ms-3 d-none d-sm-inline">Products</span>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-box-open icon-main"></i>
+                                        <i class="fas fa-tag icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3 d-none d-sm-inline">Products</span>
+                                </div>
                             </a>
                         </li>
                         <li class="nav-item py-2 py-sm-0">
                             <a href="transaction.html" class="nav-link text-white">
-                                <i class="fa fa-money-check" style="color: #ffffff;"></i><span class="fs-5 ms-3 d-none d-sm-inline">Transaction</span>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-receipt icon-main"></i>
+                                        <i class="fas fa-check icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3 d-none d-sm-inline">Transactions</span>
+                                </div>
                             </a>
                         </li>
                     </ul>
                 </div>
                 <div class="dropdown open p-3">
-                    <button class="btn border-none dropdown-toggle text-white" type="button" id="triggerId" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa-solid fa-user" style="color: #ffffff;"></i><span class="ms-2">Admin</span>
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="triggerId">
-                        <button class="dropdown-item" href="#">Setting</button>
-                        <button class="dropdown-item" href="#">Profile</button>
-                    </div>
+                    <a href="/frontend/profile.html" class="btn text-white">
+                        <i class="fa-solid fa-user"></i><span class="ms-2">Profile</span>
+                    </a>
                 </div>
             </div>
 
             <!-- Main Content -->
-            <div class="col-md-8 ">
-                <div class="container mt-5 ">
-                    <div class="row">
-                        <!-- Total Orders -->
-                        <div class="col-md-4">
-                            <div class="total-orders">
-                                <h5>Dec 5, 2025 - Monday</h5>
-                                <p>Ryzen: 50 Honey Glaze Chicken</p>
-                                <p>Ryzen: 5kg Spaghetti</p>
-                                <p>Ryzen: 20kg Pasta</p>
+            <div class="col py-3 main-content">
+                <div class="dashboard-header">
+                    <h3 class="m-0">Dashboard Overview</h3>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12 px-4 mb-4">
+                        <div id="sales-insights"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 px-4 mb-4">
+                        <div id="order-predictions"></div>
+                    </div>
+                    <div class="col-md-6 px-4 mb-4">
+                        <div id="transaction-anomalies"></div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 px-4">
+                    <div class="container">
+                        <!-- Pending Orders Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-4"S>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-clock text-warning me-2 fs-4"></i>
+                                <h4 class="mb-0 text-primary fw-bold">Pending Orders</h4>
+                            </div>
+                            <div class="badge bg-warning text-light px-3 py-2">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Showing pending orders from the last 3 days
                             </div>
                         </div>
-
-                        <div class="col-md-4">
-                            <div class="total-orders">
-                                <h5>Dec 6, 2025 - Monday</h5>
-                                <p>Jane: 150 Chicken</p>
-                                <p>Jane: 50 Tubs Pasta</p>
-                                <p>Jane: 5kg Carbonara</p>
-                            </div>
+                        <div class="row g-4" id="pendingOrdersContainer">
+                            <!-- Pending orders will be populated here -->
                         </div>
+                    </div>
+                </div>
 
-                        <div class="col-md-4">
-                            <div class="total-orders">
-                                <h5>Dec 7, 2025 - Monday</h5>
-                                <p>John: 90 Chicken</p>
-                                <p>John: 10 Tubs Pasta</p>
-                                <p>John: 5kg Carbonara</p>
+                <!-- Order Summary Modal -->
+                <div class="modal fade" id="orderSummaryModal" tabindex="-1" aria-labelledby="orderSummaryModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background-color: #1a1a1a; color: white;">
+                                <h5 class="modal-title" id="orderSummaryModalLabel">
+                                    <i class="fas fa-clipboard-list me-2"></i>Order Summary
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                        </div>
-
-                        <!-- Orders Summary -->
-                        <div class="col-md-12">
-                            <div class="orders-summary row">
-                                <div class="order-card col-md-4">
-                                    <h5>Ryzen</h5>
-                                    <p>50 Honey Glaze Chicken</p>
-                                    <p>5kg Spaghetti</p>
-                                    <p>20kg Pasta</p>
-                                    <button class="btn btn-warning see-ingredients" onclick="showIngredients('Ryzen')">See Ingredients</button>
+                            <div class="modal-body p-4">
+                                <div class="summary-content">
+                                    <div class="customer-info mb-4">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-user-circle fs-4 me-2 text-primary"></i>
+                                            <h5 class="customer-name mb-0 fw-bold"></h5>
+                                        </div>
+                                    </div>
+                                    <div class="order-details mb-4">
+                                        <h6 class="fw-bold mb-3">Order Items:</h6>
+                                        <div class="order-items-list"></div>
+                                    </div>
+                                    <div class="ingredients-section">
+                                        <h6 class="fw-bold mb-3">Ingredients Required:</h6>
+                                        <div class="ingredients-list"></div>
+                                    </div>
                                 </div>
-                                <div class="order-card col-md-4">
-                                    <h5>Jane</h5>
-                                    <p>150 Chicken</p>
-                                    <p>50 Tubs Pasta</p>
-                                    <p>5kg Carbonara</p>
-                                    <button class="btn btn-warning see-ingredients" onclick="showIngredients('Jane')">See Ingredients</button>
-                                </div>
-                                <div class="order-card col-md-4">
-                                    <h5>John</h5>
-                                    <p>90 Chicken</p>
-                                    <p>10 Tubs Pasta</p>
-                                    <p>5kg Carbonara</p>
-                                    <button class="btn btn-warning see-ingredients" onclick="showIngredients('John')">See Ingredients</button>
-                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="ingredients-popout" id="ingredientsPopout">
-                    <h4>Ingredients</h4>
-                    <div id="ingredientsList"></div>
-                    <button class="close-btn" onclick="closeIngredients()">Close</button>
-                </div>
-                <div class="overlay" id="overlay"></div>
             </div>
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/ai-insights.js"></script>
     <script>
-        function showIngredients(customer) {
-            const ingredients = {
-                'Ryzen': [
-                    '50 Honey Glaze Chicken',
-                    '1/2kg Sugar',
-                    '5kg Spaghetti',
-                    '3kg Sauce'
-                ],
-                'Jane': [
-                    '150 Chicken',
-                    '2kg Salt',
-                    '50 Tubs Pasta',
-                    '5kg Carbonara Sauce'
-                ],
-                'John': [
-                    '90 Chicken',
-                    '1kg Salt',
-                    '10 Tubs Pasta',
-                    '5kg Carbonara Sauce'
-                ]
-            };
+        // API URL
+        const API_URL = 'http://localhost:4000/api';
 
-            document.getElementById('ingredientsPopout').style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
+        // Fetch pending orders
+        async function fetchOrders() {
+            try {
+                console.log('Fetching orders...');
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    throw new Error('No authentication token found');
+                }
 
-            const ingredientsList = document.getElementById('ingredientsList');
-            ingredientsList.innerHTML = ingredients[customer].map(item => `<p>${item}</p>`).join('');
+                // Remove the include=products parameter since the backend already populates product details
+                const response = await fetch(`${API_URL}/orders`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const orders = await response.json();
+                console.log('Received orders:', orders); // This will help debug the response
+
+                // Filter orders for last 3 days and pending status
+                const today = new Date();
+                today.setHours(23, 59, 59, 999);
+                
+                const threeDaysAgo = new Date(today);
+                threeDaysAgo.setDate(today.getDate() - 2);
+                threeDaysAgo.setHours(0, 0, 0, 0);
+
+                const pendingOrders = orders.filter(order => {
+                    const orderDate = new Date(order.orderDate);
+                    return orderDate >= threeDaysAgo && 
+                           orderDate <= today && 
+                           order.status.toLowerCase() === 'pending';
+                });
+
+                // Add this debug log to check the filtered orders
+                console.log('Pending orders:', pendingOrders);
+
+                // Group orders by date
+                const groupedOrders = groupOrdersByDate(pendingOrders);
+                displayPendingOrders(groupedOrders);
+
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load pending orders: ' + error.message
+                });
+            }
         }
 
-        function closeIngredients() {
-            document.getElementById('ingredientsPopout').style.display = 'none';
-            document.getElementById('overlay').style.display = 'none';
+        // Group orders by date
+        function groupOrdersByDate(orders) {
+            const groups = {};
+            orders.forEach(order => {
+                const date = new Date(order.orderDate).toISOString().split('T')[0];
+                if (!groups[date]) {
+                    groups[date] = [];
+                }
+                groups[date].push(order);
+            });
+            return groups;
         }
+
+        // Display pending orders
+        function displayPendingOrders(groupedOrders) {
+            const container = document.getElementById('pendingOrdersContainer');
+            container.innerHTML = '';
+
+            if (Object.keys(groupedOrders).length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No pending orders found for the last 3 days
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort dates in descending order
+            const sortedDates = Object.keys(groupedOrders).sort().reverse();
+
+            sortedDates.forEach(date => {
+                const orders = groupedOrders[date];
+                const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'short',
+                    day: 'numeric'
+                });
+
+                container.innerHTML += `
+                    <div class="col-md-4">
+                        <div class="card shadow-sm" onclick="showDayOrderSummary('${date}', ${JSON.stringify(orders).replace(/'/g, "\\'").replace(/"/g, '&quot;')})">
+                            <div class="card-header bg-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-calendar-day me-2"></i>${formattedDate}
+                                    </h5>
+                                    <span class="badge bg-warning text-dark">
+                                        ${orders.length} Orders
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-body" style="min-height: 150px; max-height: 300px; overflow-y: auto;">
+                                <div class="order-list">
+                                    ${orders.map(order => `
+                                        <div class="order-item mb-3 p-2 border-bottom">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <i class="fas fa-user-circle text-primary me-2"></i>
+                                                <span class="fw-bold">${order.customerName}</span>
+                                            </div>
+                                            <div class="ms-4">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock me-1"></i>${order.orderTime || 'N/A'}
+                                                </small>
+                                                <div class="mt-1">
+                                                    ${order.orderDetails.map(detail => `
+                                                        <div class="text-truncate">
+                                                            <i class="fas fa-utensils me-1"></i>
+                                                            ${detail.price ? `Item (₱${detail.price})` : 'Unknown Item'} x${detail.quantity || 1}
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Show day order summary
+        function showDayOrderSummary(date, orders) {
+            // Calculate total ingredients needed for all orders
+            const ingredientTotals = {};
+            
+            orders.forEach(order => {
+                order.orderDetails.forEach(detail => {
+                    if (detail.product && Array.isArray(detail.product.ingredients)) {
+                        detail.product.ingredients.forEach(ingredient => {
+                            const quantity = detail.quantity || 1;
+                            if (ingredientTotals[ingredient]) {
+                                ingredientTotals[ingredient] += quantity;
+                            } else {
+                                ingredientTotals[ingredient] = quantity;
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Format the date
+            const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Create the modal content
+            const modalContent = `
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-calendar-day me-2"></i>
+                        Pending Orders Summary - ${formattedDate}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold mb-3">
+                                <i class="fas fa-list me-2"></i>Orders (${orders.length})
+                            </h6>
+                            <div class="order-list">
+                                ${orders.map(order => `
+                                    <div class="order-item mb-3 p-3 border rounded">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-bold">${order.customerName}</span>
+                                            <small class="text-muted">${order.orderTime || 'N/A'}</small>
+                                        </div>
+                                        <div class="products-list">
+                                            ${order.orderDetails.map(detail => `
+                                                <div class="product-item">
+                                                    <i class="fas fa-utensils me-2"></i>
+                                                    ${detail.product ? detail.product.productName : 'Unknown Product'} x${detail.quantity || 1}
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold mb-3">
+                                <i class="fas fa-shopping-basket me-2"></i>Total Ingredients Needed
+                            </h6>
+                            <div class="ingredients-list">
+                                ${Object.entries(ingredientTotals).map(([ingredient, quantity]) => `
+                                    <div class="ingredient-item d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
+                                        <div>
+                                            <i class="fas fa-carrot me-2"></i>
+                                            ${ingredient}
+                                        </div>
+                                        <span class="badge bg-primary">${quantity} units</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            `;
+
+            // Update and show the modal
+            const modal = document.getElementById('orderSummaryModal');
+            modal.querySelector('.modal-content').innerHTML = modalContent;
+            new bootstrap.Modal(modal).show();
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchOrders();
+        });
     </script>
 </body>
-
 </html>
+
+ 

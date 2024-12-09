@@ -1,111 +1,143 @@
-const Product = require('../models/productModel'); // Ensure the path is correct
+const Product = require('../models/productModel');
+const mongoose = require('mongoose');
 
-const multer = require('multer');
-const path = require('path');
-
-// Configure multer for image uploads
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');  // Store uploaded images in the 'uploads' folder
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));  // Add timestamp to filenames to avoid collisions
-    }
-});
-
-const upload = multer({ storage: storage });
-
-// Create product
-const createProduct = async (req, res) => {
-    // Validate request
-    const { productName, price, ingredients } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : null;
-    console.log("Image URL:", image);  // Add this to check the value
-
-    // Check if all required fields are provided
-    if (!productName || !price || !ingredients || !image) {
-        return res.status(400).json({ error: 'Product name, price, ingredients, and image are required.' });
-    }
-
+// Create a new product
+exports.createProduct = async (req, res) => {
     try {
+        const { productId, productName, category, price, ingredients } = req.body;
+        
+        // Validate that ingredients is already an array
+        if (!Array.isArray(ingredients)) {
+            return res.status(400).json({ 
+                message: 'Ingredients must be an array' 
+            });
+        }
+
+        // Validate category
+        const validCategories = ['Starters', 'Pasta', 'Mains', 'Dessert'];
+        if (!validCategories.includes(category)) {
+            return res.status(400).json({
+                message: 'Invalid category. Must be one of: Starters, Pasta, Mains, Dessert'
+            });
+        }
+
         // Create new product
-        const product = new Product({ productName, price, ingredients, image });
-        await product.save();
-        res.status(200).json(product);
+        const product = new Product({
+            productId,
+            productName,
+            category,
+            price,
+            ingredients
+        });
+
+        const savedProduct = await product.save();
+        res.status(201).json(savedProduct);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        console.error('Error creating product:', error);
+        res.status(500).json({ 
+            message: error.message 
+        });
     }
 };
 
 // Get all products
-const getProducts = async (req, res) => {
+exports.getProducts = async (req, res) => {
     try {
-        const products = await Product.find();
-        res.status(200).json(products);
+        const { category } = req.query; // Add query parameter for category filtering
+        
+        let query = {};
+        if (category) {
+            query.category = category;
+        }
+
+        const products = await Product.find(query);
+        res.json(products);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
 
-// Get single product by ID
-const getProduct = async (req, res) => {
-    const { id } = req.params;
+// Get product by ID
+exports.getProductById = async (req, res) => {
     try {
-        const product = await Product.findById(id);
+        const product = await Product.findById(req.params.id);
         if (!product) {
-            return res.status(404).json({ error: 'Product not found' });
+            return res.status(404).json({ message: 'Product not found' });
         }
-        res.status(200).json(product);
+        res.json(product);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
 
-// Delete a product by ID
-const deleteProduct = async (req, res) => {
-    const { id } = req.params;
+// Update product
+exports.updateProduct = async (req, res) => {
     try {
-        const deletedProduct = await Product.findByIdAndDelete(id);
-        if (!deletedProduct) {
-            return res.status(404).json({ error: 'Product not found' });
+        const { productName, category, price, ingredients } = req.body;
+        const product = await Product.findById(req.params.id);
+        
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
         }
-        res.status(200).json({ message: 'Product deleted successfully' });
+
+        // Validate category if it's being updated
+        if (category) {
+            const validCategories = ['Starters', 'Pasta', 'Mains', 'Dessert'];
+            if (!validCategories.includes(category)) {
+                return res.status(400).json({
+                    message: 'Invalid category. Must be one of: Starters, Pasta, Mains, Dessert'
+                });
+            }
+        }
+
+        // Update fields if provided
+        product.productName = productName || product.productName;
+        product.category = category || product.category;
+        product.price = price || product.price;
+        if (ingredients) {
+            if (Array.isArray(ingredients)) {
+                product.ingredients = ingredients;
+            } else if (typeof ingredients === 'string') {
+                product.ingredients = ingredients.split(',').map(item => item.trim());
+            }
+        }
+
+        await product.save();
+        res.json(product);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(400).json({ message: error.message });
     }
 };
 
-// Update a product by ID
-const updateProduct = (req, res) => {
-    // Handle the case when no file is uploaded (optional, depends on your requirements)
-    const { productName, price, ingredients } = req.body;
-    const image = req.file ? req.file.path : null; // Get the file path if a new file is uploaded
-
-    if (!productName || !price || !ingredients) {
-        return res.status(400).json({ error: "All fields are required." });
+// Delete product
+exports.deleteProduct = async (req, res) => {
+    try {
+        const product = await Product.findByIdAndDelete(req.params.id);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+        res.json({ message: 'Product deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
-
-    // Your logic to update the product in the database
-    // Assume you have a Product model and you're using Mongoose
-    Product.findByIdAndUpdate(req.params.id, {
-        productName,
-        price,
-        ingredients,
-        image
-    }, { new: true })
-    .then(updatedProduct => {
-        res.json(updatedProduct); // Send the updated product as the response
-    })
-    .catch(error => {
-        res.status(500).json({ error: "Error updating product" });
-    });
 };
 
-module.exports = {
-    createProduct,
-    getProducts,
-    getProduct,
-    deleteProduct,
-    updateProduct,
-    upload // Export multer instance for use in routes
+// Get products by category
+exports.getProductsByCategory = async (req, res) => {
+    try {
+        const { category } = req.params;
+        const validCategories = ['Starters', 'Pasta', 'Mains', 'Dessert'];
+        
+        if (!validCategories.includes(category)) {
+            return res.status(400).json({
+                message: 'Invalid category. Must be one of: Starters, Pasta, Mains, Dessert'
+            });
+        }
+
+        const products = await Product.findByCategory(category);
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
+

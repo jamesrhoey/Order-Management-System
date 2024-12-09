@@ -5,77 +5,112 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="/frontend/assets/css/order.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <title>Home</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+
 </head>
 
 <body>
     <div class="container-fluid">
         <div class="row flex-nowrap">
-            <div class="bg-dark col-auto min-vh-100 d-flex flex-column justify-content-between">
-                <div class="bg-dark p-2">
+            <!-- Sidebar -->
+            <div class="sidebar col-auto min-vh-100 d-flex flex-column justify-content-between">
+                <div class=" p-2">
                     <a href="" class="d-flex text-decoration-none mt-1 align-items-center text-white">
-                        <span>TINDAHAN NI RYZEN</span>
+                        <div class="logo-container me-3">
+                            <div class="logo-icon-wrapper">
+                                <i class="fas fa-bolt logo-icon-accent"></i>
+                                <i class="fas fa-shopping-basket logo-icon-main"></i>
+                            </div>
+                        </div>
+                        <div class="brand-text">
+                            <span class="brand-name">Simpli<span class="text-accent">Serve</span></span>
+                        </div>
                     </a>
-                    <ul class="nav nav-pills  flex-column mt-4">
+                    <ul class="nav nav-pills flex-column mt-4">
                         <li class="nav-item py-2 py-sm-0">
                             <a href="index.html" class="nav-link text-white">
-                                <i class="fa fa-gauge"></i><span class="fs-5 ms-3 d-none d-sm-inline">Dashboard</span>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-chart-line icon-main"></i>
+                                        <i class="fas fa-circle icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3 d-none d-sm-inline">Dashboard</span>
+                                </div>
                             </a>
                         </li>
                         <li class="nav-item py-2 py-sm-0">
                             <a href="order.html" class="nav-link active text-white">
-                                <i class="fa fa-clipboard" style="color: #ffffff;"></i><span
-                                    class="fs-5 ms-3 d-none d-sm-inline">Orders</span>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-shopping-bag icon-main"></i>
+                                        <i class="fas fa-plus icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3 d-none d-sm-inline">Orders</span>
+                                </div>
                             </a>
                         </li>
                         <li class="nav-item py-2 py-sm-0">
                             <a href="product.html" class="nav-link text-white">
-                                <i class="fa fa-table-list" style="color: #ffffff;"></i><span
-                                    class="fs-5 ms-3 d-none d-sm-inline">Products</span>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-box-open icon-main"></i>
+                                        <i class="fas fa-tag icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3 d-none d-sm-inline">Products</span>
+                                </div>
                             </a>
                         </li>
                         <li class="nav-item py-2 py-sm-0">
                             <a href="transaction.html" class="nav-link text-white">
-                                <i class="fa fa-money-check" style="color: #ffffff;"></i><span
-                                    class="fs-5 ms-3 d-none d-sm-inline">Transaction</span>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-receipt icon-main"></i>
+                                        <i class="fas fa-check icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3 d-none d-sm-inline">Transactions</span>
+                                </div>
                             </a>
                         </li>
                     </ul>
                 </div>
                 <div class="dropdown open p-3">
-                    <button class="btn border-none dropdown-toggle text-white" type="button" id="triggerId"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa-solid fa-user" style="color: #ffffff;"></i><span class="ms-2">Admin</span>
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="triggerId">
-                        <button class="dropdown-item" href="#">Setting</button>
-                        <button class="dropdown-item " href="#">Profile</button>
-                    </div>
+                    <a href="/frontend/profile.html" class="btn text-white">
+                        <i class="fa-solid fa-user"></i><span class="ms-2">Profile</span>
+                    </a>
                 </div>
             </div>
 
             <!-- Main Content -->
             <section class="container col-auto col-sm-6 col-md-10 g-2 py-5">
-                <!-- Button to add order -->
-                <button class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#addOrderModal">Add Order</button>
-
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <button class="btn btn-primary ms-4" data-bs-toggle="modal" data-bs-target="#addOrderModal">
+                        <i class="fas fa-plus me-2"></i>Add Order
+                    </button>
+                    
+                    <div class="d-flex gap-2 align-items-center me-4">
+                        <label for="orderDateFilter" class="form-label mb-0 me-2">Filter by date:</label>
+                        <input type="date" id="orderDateFilter" class="form-control" style="width: auto;">
+                    </div>
+                </div>
                 <!-- Order Table -->
-                <div class="table-responsive mt-4 p-4 wrapper rounded-3">
-                    <table class="table table-hover">
-                        <thead class="bg-light text-center">
-                            <tr class="align-middle">
-                                <th>OrderId</th>
-                                <th>Customer Name</th>
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Payment Method</th>
-                                <th>View</th>
-                                <th>Status</th>
+                <div class="table-responsive mt-4 p-4 wrapper rounded-3 shadow-sm">
+                    <table class="table table-hover align-middle mb-0 bg-white">
+                        <thead>
+                            <tr class="text-center" style="background-color: #f8f9fa;">
+                                <th class="py-3">OrderId</th>
+                                <th class="py-3">Customer Name</th>
+                                <th class="py-3">Date</th>
+                                <th class="py-3">Time</th>
+                                <th class="py-3">Payment Method</th>
+                                <th class="py-3">Order Details</th>
+                                <th class="py-3">Status</th>
+                                <th class="py-3">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="table-hover text-center" id="userDetails">
-                            <!-- Dynamic order rows will be added here -->
+                        <tbody class="text-center" id="userDetails">
+                            <!-- Orders will be populated here dynamically -->
                         </tbody>
                     </table>
                 </div>
@@ -85,95 +120,633 @@
 
     <!-- Add Order Modal -->
     <div class="modal fade" id="addOrderModal" tabindex="-1" aria-labelledby="addOrderModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="addOrderModalLabel">Add Order</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header" style="background-color: #1a1a1a; color: white;">
+                    <h5 class="modal-title" id="addOrderModalLabel">
+                        <i class="fa fa-plus-circle me-2"></i>Add New Order
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form id="orderForm">
-                        <div class="mb-3">
-                            <label for="customerName" class="form-label text">Customer Name</label>
-                            <input type="text" class="form-control" id="customerName" required>
+                <div class="modal-body p-4">
+                    <form id="addOrderForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="customerName" class="form-label fw-bold">
+                                    <i class="fa fa-user me-2"></i>Customer Name
+                                </label>
+                                <input type="text" class="form-control shadow-sm" id="customerName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="contactNumber" class="form-label fw-bold">
+                                    <i class="fa fa-phone me-2"></i>Contact Number
+                                </label>
+                                <input type="text" class="form-control shadow-sm" id="contactNumber" required>
+                            </div>
                         </div>
+                        
                         <div class="mb-3">
-                            <label for="deliveryAddress" class="form-label ">Delivery Address</label>
-                            <input type="text" class="form-control" id="deliveryAddress" required>
+                            <label for="deliveryAddress" class="form-label fw-bold">
+                                <i class="fa fa-location-dot me-2"></i>Delivery Address
+                            </label>
+                            <input type="text" class="form-control shadow-sm" id="deliveryAddress" required>
                         </div>
-                        <div class="mb-3">
-                            <label for="contactNumber" class="form-label">Contact Number</label>
-                            <input type="text" class="form-control" id="contactNumber" required>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fa fa-cart-shopping me-2"></i>Select Products
+                            </label>
+                            <div class="row g-3" id="productCheckboxContainer">
+                                <!-- Products will be populated here dynamically -->
+                            </div>
                         </div>
+
                         <div class="mb-3">
-                            <label for="orderDetails" class="form-label">Order Details</label>
-                            <textarea class="form-control" id="orderDetails" rows="3" required></textarea>
+                            <label for="notes" class="form-label fw-bold">
+                                <i class="fa fa-note-sticky me-2"></i>Notes
+                            </label>
+                            <textarea class="form-control shadow-sm" id="notes" rows="2"></textarea>
                         </div>
-                        <div class="mb-3">
-                            <label for="notes" class="form-label">Notes</label>
-                            <textarea class="form-control" id="notes" rows="2"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="paymentMethod" class="form-label">Payment Method</label>
-                            <select class="form-control" id="paymentMethod" required>
+
+                        <div class="mb-4">
+                            <label for="paymentMethod" class="form-label fw-bold">
+                                <i class="fa fa-credit-card me-2"></i>Payment Method
+                            </label>
+                            <select class="form-select shadow-sm" id="paymentMethod" required>
+                                <option value="" selected disabled>Select payment method</option>
                                 <option value="Cash">Cash</option>
                                 <option value="Gcash">Gcash</option>
-                                <option value="Bank Transfer">Bank Transfer</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary">Add Order</button>
+
+                        <div class="text-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-save me-2"></i>Save Order
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Set the current date and time when the modal opens
-        $('#addOrderModal').on('show.bs.modal', function () {
-            const now = new Date();
-            const date = now.toISOString().split('T')[0]; // Get date in YYYY-MM-DD format
-            const time = now.toTimeString().split(' ')[0]; // Get time in HH:MM:SS format
-            document.getElementById('orderDate').value = date;
-            document.getElementById('orderTime').value = time;
+    <!-- Edit Order Modal -->
+    <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title" id="editOrderModalLabel">Edit Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editOrderForm">
+                        <div class="mb-3">
+                            <label for="editCustomerName" class="form-label">Customer Name</label>
+                            <input type="text" class="form-control" id="editCustomerName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDeliveryAddress" class="form-label">Delivery Address</label>
+                            <input type="text" class="form-control" id="editDeliveryAddress" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editContactNumber" class="form-label">Contact Number</label>
+                            <input type="text" class="form-control" id="editContactNumber" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editProductSelect" class="form-label">Select Products</label>
+                            <div id="editProductSelect">
+                                <label><input type="checkbox" class="product-checkbox" value="Adobowow"> Adobowow</label><br>
+                                <label><input type="checkbox" class="product-checkbox" value="Sinugnog"> Sinugnog</label><br>
+                                <label><input type="checkbox" class="product-checkbox" value="Kalebayor"> Kalebayor</label><br>
+                                <label><input type="checkbox" class="product-checkbox" value="Sinalsale"> Sinalsale</label><br>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editNotes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="editNotes" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPaymentMethod" class="form-label">Payment Method</label>
+                            <select class="form-control" id="editPaymentMethod" required>
+                                <option value="Cash">Cash</option>
+                                <option value="Gcash">Gcash</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-warning">Update Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Order Details Modal -->
+    <div class="modal fade" id="viewOrderDetailsModal" tabindex="-1" aria-labelledby="viewOrderDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #1a1a1a; color: white;">
+                    <h5 class="modal-title" id="viewOrderDetailsModalLabel">
+                        <i class="fa fa-info-circle me-2"></i>Order Details
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Products:</h6>
+                        <p id="viewOrderProducts"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Notes:</h6>
+                        <p id="viewOrderNotes"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Delivery Address:</h6>
+                        <p id="viewDeliveryAddress"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Contact Number:</h6>
+                        <p id="viewContactNumber"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+let orderIdCounter = 1; // Keeps track of order IDs
+let editingOrderIndex = null; // Tracks the index of the order being edited
+
+// Add this function before the loadOrders function
+function viewOrderDetails(orderId, products, notes, deliveryAddress, contactNumber) {
+    document.getElementById('viewOrderProducts').textContent = products;
+    document.getElementById('viewOrderNotes').textContent = notes || 'No notes provided';
+    document.getElementById('viewDeliveryAddress').textContent = deliveryAddress;
+    document.getElementById('viewContactNumber').textContent = contactNumber;
+    
+    const modal = new bootstrap.Modal(document.getElementById('viewOrderDetailsModal'));
+    modal.show();
+}
+
+// Update the loadOrders function
+async function loadOrders() {
+    try {
+        const dateFilter = document.getElementById('orderDateFilter').value;
+        let url = 'http://localhost:4000/api/orders';
+        
+        if (dateFilter) {
+            url += `?date=${dateFilter}`;
+        }
+        
+        // Get the token from localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+            // Redirect to login if no token
+            window.location.href = '/frontend/login.html';
+            return;
+        }
+        
+        console.log('Fetching orders from:', url); // Debug log
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
         });
 
-        document.getElementById('orderForm').addEventListener('submit', function (event) {
-            event.preventDefault();
+        if (response.status === 401) {
+            // Token expired or invalid
+            localStorage.removeItem('token');
+            window.location.href = '/frontend/login.html';
+            return;
+        }
 
-            // Get form values
-            const customerName = document.getElementById('customerName').value;
-            const orderDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD
-            const orderTime = new Date().toTimeString().split(' ')[0]; // Get current time in HH:MM:SS
-            const deliveryAddress = document.getElementById('deliveryAddress').value;
-            const contactNumber = document.getElementById('contactNumber').value;
-            const orderDetails = document.getElementById('orderDetails').value;
-            const notes = document.getElementById('notes').value;
-            const paymentMethod = document.getElementById('paymentMethod').value;
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const orders = await response.json();
+        console.log('Received orders:', orders); // Debug log
+        
+        const userDetailsTable = document.getElementById('userDetails');
+        userDetailsTable.innerHTML = '';
 
-            // Create a new order row
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-                <td>${Math.floor(Math.random() * 1000)}</td>
-                <td>${customerName}</td>
+        // If no orders found, show message
+        if (!orders || orders.length === 0) {
+            userDetailsTable.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-4">
+                        <i class="fa fa-info-circle me-2"></i>
+                        ${dateFilter ? 'No orders found for selected date' : 'No orders found'}
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        orders.forEach((order, index) => {
+            // Format the date and time
+            const orderDate = order.orderDate ? new Date(order.orderDate).toLocaleDateString() : 'N/A';
+            const orderTime = order.orderTime || 'N/A';
+            
+            // Get product details
+            const orderDetails = order.orderDetails
+                .map(detail => detail.product ? detail.product.productName : 'Unknown Product')
+                .join(', ');
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="fw-bold">${order._id.slice(-4)}</td>
+                <td>
+                    <div class="d-flex align-items-center" style="max-width: 200px;">
+                        <div class="d-flex align-items-center gap-2 text-start">
+                            <i class="fas fa-user-circle text-primary" style="font-size: 1.5rem;"></i>
+                            <div class="text-truncate" style="max-width: 150px;" title="${order.customerName}">
+                                ${order.customerName}
+                            </div>
+                        </div>
+                    </div>
+                </td>
                 <td>${orderDate}</td>
                 <td>${orderTime}</td>
-                <td>${paymentMethod}</td>
-                <td><i class="fa-solid fa-eye" style="color: #1000f5;"></i></td>
-                <td><span class="pending">Pending</span></td>
+                <td>
+                    <span class="badge ${getPaymentMethodBadgeClass(order.paymentMethod)}">
+                        ${order.paymentMethod}
+                    </span>
+                </td>
+                <td>
+                    <a href="#" class="text-primary text-decoration-none" 
+                       onclick="viewOrderDetails('${order._id}', \`${orderDetails}\`, \`${order.notes || ''}\`, \`${order.deliveryAddress}\`, \`${order.contactNumber}\`)">
+                        <i class="fas fa-eye me-1"></i>View Details
+                    </a>
+                </td>
+                <td>
+                    <span class="badge ${getStatusBadgeClass(order.status)}">
+                        ${order.status}
+                    </span>
+                </td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="editOrder('${order._id}')">
+                        <i class="fa fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteOrder('${order._id}')">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </td>
             `;
-
-            // Append the new row to the table
-            document.getElementById('userDetails').appendChild(newRow);
-
-            // Close the modal
-            $('#addOrderModal').modal('hide');
-
-            // Clear the form
-            document.getElementById('orderForm').reset();
+            userDetailsTable.appendChild(row);
         });
+    } catch (error) {
+        console.error('Error loading orders:', error);
+        if (error.message.includes('401')) {
+            // If unauthorized, redirect to login
+            window.location.href = '/frontend/login.html';
+            return;
+        }
+        const userDetailsTable = document.getElementById('userDetails');
+        userDetailsTable.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center text-danger">
+                    <i class="fa fa-exclamation-circle me-2"></i>
+                    Failed to load orders: ${error.message}
+                </td>
+            </tr>
+        `;
+    }
+}
+
+// Helper function to get the appropriate badge class based on status
+function getStatusBadgeClass(status) {
+    if (!status) return 'bg-secondary'; // Default case for null/undefined status
+    
+    switch (status.toLowerCase()) {
+        case 'pending':
+            return 'bg-warning text-dark';
+        case 'completed':
+            return 'bg-success';
+        case 'cancelled':
+            return 'bg-danger';
+        default:
+            return 'bg-secondary';
+    }
+}
+
+// Update the payment method badge helper function
+function getPaymentMethodBadgeClass(method) {
+    if (!method) return 'bg-secondary';
+    
+    switch (method.toLowerCase()) {
+        case 'cash':
+            return 'bg-success';
+        case 'gcash':
+            return 'bg-primary';
+        default:
+            return 'bg-secondary';
+    }
+}
+
+// Update the Add Order form submission handler
+document.getElementById('addOrderForm').addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    try {
+        const customerName = document.getElementById('customerName').value;
+        const deliveryAddress = document.getElementById('deliveryAddress').value;
+        const contactNumber = document.getElementById('contactNumber').value;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const notes = document.getElementById('notes').value;
+
+        // Get selected products with their MongoDB IDs
+        const selectedProducts = Array.from(document.querySelectorAll('.product-checkbox:checked'))
+            .map(checkbox => ({
+                productId: checkbox.value,  // This will now be the MongoDB _id
+                productName: checkbox.dataset.name
+            }));
+
+    if (selectedProducts.length === 0) {
+        alert("Please select at least one product.");
+        return;
+    }
+
+        const orderData = {
+            customerName,
+            deliveryAddress,
+            contactNumber,
+            paymentMethod,
+            products: selectedProducts.map(p => p.productId), // Send only the MongoDB IDs
+            notes,
+            orderDate: new Date().toISOString().split('T')[0],
+            orderTime: new Date().toTimeString().split(' ')[0],
+            status: 'Pending'
+        };
+
+        console.log('Sending order data:', orderData); // Debug log
+
+        const response = await fetch('http://localhost:4000/api/orders', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(orderData)
+        });
+
+        const responseData = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(`Server Error: ${responseData.message || 'Unknown error'}`);
+        }
+
+        // Success handling
+        const addModal = bootstrap.Modal.getInstance(document.getElementById('addOrderModal'));
+        addModal.hide();
+        this.reset();
+        
+        // Call loadOrders to refresh the table
+        await loadOrders();
+        
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Order added successfully!'
+        });
+
+    } catch (error) {
+        console.error('Full error details:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error Adding Order',
+            text: error.message
+        });
+    }
+});
+
+// Update the loadProducts function
+async function loadProducts() {
+    try {
+        const response = await fetch('http://localhost:4000/api/products');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const products = await response.json();
+        
+        const container = document.getElementById('productCheckboxContainer');
+        container.innerHTML = '';
+        
+        products.forEach((product, index) => {
+            if (index % 2 === 0) {
+                container.innerHTML += `<div class="col-md-6">`;
+            }
+            
+            const productHtml = `
+                <div class="form-check custom-checkbox">
+                    <input type="checkbox" class="form-check-input product-checkbox" 
+                           value="${product._id}" 
+                           data-name="${product.productName}"
+                           id="product_${product._id}">
+                    <label class="form-check-label" for="product_${product._id}">
+                        ${product.productName} - ₱${product.price}
+                    </label>
+                </div>
+            `;
+            
+            container.lastElementChild.innerHTML += productHtml;
+            
+            if (index % 2 === 1 || index === products.length - 1) {
+                container.innerHTML += `</div>`;
+            }
+        });
+    } catch (error) {
+        console.error('Error loading products:', error);
+        const container = document.getElementById('productCheckboxContainer');
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                Failed to load products. Please try again later.
+                Error: ${error.message}
+            </div>
+        `;
+    }
+}
+
+// Function to hndle Edit Ordera form submission
+document.getElementById('editOrderForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const customerName = document.getElementById('editCustomerName').value;
+    const deliveryAddress = document.getElementById('editDeliveryAddress').value;
+    const contactNumber = document.getElementById('editContactNumber').value;
+    const paymentMethod = document.getElementById('editPaymentMethod').value;
+
+    const selectedProducts = Array.from(document.querySelectorAll('.edit-product-checkbox:checked'))
+        .map(checkbox => checkbox.value);
+
+    if (selectedProducts.length === 0) {
+        alert("Please select at least one product.");
+        return;
+    }
+
+    const orderDetails = selectedProducts.join(", ");
+
+    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+    orders[editingOrderIndex] = {
+        ...orders[editingOrderIndex], // Keep existing orderId and other details
+        customerName,
+        deliveryAddress,
+        contactNumber,
+        paymentMethod,
+        orderDetails
+    };
+
+    localStorage.setItem("orders", JSON.stringify(orders));
+    loadOrders();
+
+    const editModal = bootstrap.Modal.getInstance(document.getElementById('editOrderModal'));
+    editModal.hide();
+    document.getElementById('editOrderForm').reset();
+    editingOrderIndex = null;
+});
+
+// Function to edit an order
+function editOrder(index) {
+    editingOrderIndex = index;
+    const orders = JSON.parse(localStorage.getItem("orders")) || [];
+    const order = orders[index];
+
+    document.getElementById('editCustomerName').value = order.customerName;
+    document.getElementById('editDeliveryAddress').value = order.deliveryAddress;
+    document.getElementById('editContactNumber').value = order.contactNumber;
+    document.getElementById('editPaymentMethod').value = order.paymentMethod;
+
+    const productCheckboxes = document.querySelectorAll('.edit-product-checkbox');
+    productCheckboxes.forEach(checkbox => {
+        checkbox.checked = order.orderDetails.includes(checkbox.value);
+    });
+
+    const editModal = new bootstrap.Modal(document.getElementById('editOrderModal'));
+    editModal.show();
+}
+
+// Update the deleteOrder function
+async function deleteOrder(orderId) {
+    try {
+        // Show confirmation dialog
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+            const response = await fetch(`http://localhost:4000/api/orders/${orderId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete order');
+            }
+
+            await loadOrders(); // Refresh the table
+
+            Swal.fire(
+                'Deleted!',
+                'Order has been deleted.',
+                'success'
+            );
+        }
+    } catch (error) {
+        console.error('Error deleting order:', error);
+        Swal.fire(
+            'Error!',
+            'Failed to delete order.',
+            'error'
+        );
+    }
+}
+
+// Add new function to edit order status
+async function editOrder(orderId) {
+    try {
+        const { value: status } = await Swal.fire({
+            title: 'Update Order Status',
+            input: 'select',
+            inputOptions: {
+                'Pending': 'Pending',
+                'Completed': 'Completed',
+                'Cancelled': 'Cancelled'
+            },
+            inputPlaceholder: 'Select status',
+            showCancelButton: true,
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Please select a status!';
+                }
+            }
+        });
+
+        if (status) {
+            const response = await fetch(`http://localhost:4000/api/orders/${orderId}/status`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update status');
+            }
+
+            await loadOrders(); // Refresh the table
+
+            Swal.fire(
+                'Updated!',
+                'Order status has been updated.',
+                'success'
+            );
+        }
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        Swal.fire(
+            'Error!',
+            'Failed to update order status.',
+            'error'
+        );
+    }
+}
+
+// Update the window.onload function
+window.onload = function() {
+    // Check for authentication
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/frontend/login.html';
+        return;
+    }
+
+    // Set today's date as default
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('orderDateFilter').value = today;
+    
+    loadOrders();
+    loadProducts();
+};
+
+// Add event listener for date filter changes
+document.getElementById('orderDateFilter').addEventListener('change', loadOrders);
+
     </script>
 </body>
 

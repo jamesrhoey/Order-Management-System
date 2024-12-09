@@ -1,3 +1,8 @@
+// Add DOM content loaded event listener
+document.addEventListener('DOMContentLoaded', function() {
+    fetchProducts();
+});
+
 // Fetch products from the backend API and populate the table
 async function fetchProducts() {
     try {
@@ -15,7 +20,12 @@ async function fetchProducts() {
 
 // Function to dynamically populate the table with fetched products
 function populateTable(products) {
-    const tableBody = document.getElementById("userDetails");
+    const tableBody = document.getElementById("transactionTableBody");
+    if (!tableBody) {
+        console.error('Could not find element with ID "transactionTableBody"');
+        return;
+    }
+    
     tableBody.innerHTML = ""; // Clear existing rows
 
     products.forEach(product => {
@@ -26,7 +36,7 @@ function populateTable(products) {
         nameCell.textContent = product.productName;
 
         const priceCell = document.createElement("td");
-        priceCell.textContent = `$${product.price}`;
+        priceCell.textContent = `₱${product.price}`;
 
         const ingredientsCell = document.createElement("td");
         ingredientsCell.textContent = product.ingredients;
@@ -87,6 +97,6 @@ function filterByStatus(status) {
         }
     }
 }
-
 // Fetch products and populate the table on page load
 fetchProducts();
+
