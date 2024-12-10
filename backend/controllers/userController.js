@@ -18,26 +18,47 @@ const getProfile = async (req, res) => {
 const changePassword = async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
+        console.log('Password change attempt for user ID:', req.user.id);
+        
         const user = await User.findById(req.user.id);
         
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            console.log('User not found for password change');
+            return res.status(404).json({ 
+                success: false,
+                message: 'User not found' 
+            });
         }
 
         // Check current password
         const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) {
-            return res.status(400).json({ message: 'Current password is incorrect' });
+            console.log('Current password verification failed');
+            return res.status(400).json({ 
+                success: false,
+                message: 'Current password is incorrect' 
+            });
         }
 
         // Hash new password
         const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(newPassword, salt);
-        await user.save();
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        
+        // Update user with new password
+        await User.findByIdAndUpdate(user._id, { password: hashedPassword });
+        
+        console.log('Password successfully changed for user:', user.username);
 
-        res.json({ message: 'Password updated successfully' });
+        res.json({ 
+            success: true,
+            message: 'Password updated successfully' 
+        });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Password change error:', error);
+        res.status(500).json({ 
+            success: false,
+            message: error.message || 'Error updating password'
+        });
     }
 };
 

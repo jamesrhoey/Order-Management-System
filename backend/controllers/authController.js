@@ -40,16 +40,27 @@ const login = async (req, res) => {
     try {
         const { username, password } = req.body;
 
+        // Debug log
+        console.log('Login attempt for username:', username);
+
         // Find user
         const user = await User.findOne({ username });
         if (!user) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            console.log('User not found:', username);
+            return res.status(401).json({ 
+                success: false,
+                message: 'Invalid credentials' 
+            });
         }
 
         // Check password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            console.log('Password mismatch for user:', username);
+            return res.status(401).json({ 
+                success: false,
+                message: 'Invalid credentials' 
+            });
         }
 
         // Generate token
@@ -59,8 +70,12 @@ const login = async (req, res) => {
             { expiresIn: '24h' }
         );
 
+        // Debug log
+        console.log('Login successful for user:', username);
+
         // Send response with token and user info
         res.json({
+            success: true,
             message: 'Login successful',
             token,
             user: {
@@ -70,7 +85,11 @@ const login = async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Login error:', error);
+        res.status(500).json({ 
+            success: false,
+            message: error.message || 'An error occurred during login' 
+        });
     }
 };
 

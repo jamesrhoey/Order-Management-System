@@ -12,8 +12,8 @@
 </head>
 
 <body>
-    <div class="container-fluid">
-        <div class="row flex-nowrap">
+    <div class="container-fluid vh-100 overflow-hidden">
+        <div class="row flex-nowrap h-100">
             <!-- Sidebar -->
             <div class="sidebar col-auto min-vh-100 d-flex flex-column justify-content-between">
                 <div class=" p-2">
@@ -77,36 +77,48 @@
             </div>
 
             <!-- Main Content -->
-            <section class="container col-auto col-sm-6 col-md-10 g-2 py-5">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <button class="btn btn-primary ms-4" data-bs-toggle="modal" data-bs-target="#addOrderModal">
+            <section class="container col-auto col-sm-6 col-md-10 g-2 h-100 d-flex flex-column p-0">
+                <!-- Fixed header area -->
+                <div class="d-flex justify-content-between align-items-center mb-4 p-4">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addOrderModal">
                         <i class="fas fa-plus me-2"></i>Add Order
                     </button>
                     
-                    <div class="d-flex gap-2 align-items-center me-4">
+                    <div class="d-flex gap-2 align-items-center">
+                        <div class="me-3">
+                            <div class="input-group">
+                                <input type="text" id="orderSearchInput" class="form-control" placeholder="Search orders...">
+                                <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
                         <label for="orderDateFilter" class="form-label mb-0 me-2">Filter by date:</label>
                         <input type="date" id="orderDateFilter" class="form-control" style="width: auto;">
                     </div>
                 </div>
-                <!-- Order Table -->
-                <div class="table-responsive mt-4 p-4 wrapper rounded-3 shadow-sm">
-                    <table class="table table-hover align-middle mb-0 bg-white">
-                        <thead>
-                            <tr class="text-center" style="background-color: #f8f9fa;">
-                                <th class="py-3">OrderId</th>
-                                <th class="py-3">Customer Name</th>
-                                <th class="py-3">Date</th>
-                                <th class="py-3">Time</th>
-                                <th class="py-3">Payment Method</th>
-                                <th class="py-3">Order Details</th>
-                                <th class="py-3">Status</th>
-                                <th class="py-3">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-center" id="userDetails">
-                            <!-- Orders will be populated here dynamically -->
-                        </tbody>
-                    </table>
+
+                <!-- Scrollable content area -->
+                <div class="flex-grow-1 overflow-auto px-4">
+                    <div class="table-responsive wrapper rounded-3 shadow-sm">
+                        <table class="table table-hover align-middle mb-0 bg-white">
+                            <thead>
+                                <tr class="text-center" style="background-color: #f8f9fa;">
+                                    <th class="py-3">OrderId</th>
+                                    <th class="py-3">Customer Name</th>
+                                    <th class="py-3">Date</th>
+                                    <th class="py-3">Time</th>
+                                    <th class="py-3">Payment Method</th>
+                                    <th class="py-3">Order Details</th>
+                                    <th class="py-3">Status</th>
+                                    <th class="py-3">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center" id="userDetails">
+                                <!-- Orders will be populated here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
         </div>
@@ -285,10 +297,27 @@ function viewOrderDetails(orderId, products, notes, deliveryAddress, contactNumb
     modal.show();
 }
 
+// Add these functions before the loadOrders function
+function searchOrders(orders, searchTerm) {
+    if (!searchTerm) return orders;
+    
+    searchTerm = searchTerm.toLowerCase();
+    return orders.filter(order => 
+        order.customerName.toLowerCase().includes(searchTerm) ||
+        order._id.toLowerCase().includes(searchTerm) ||
+        order.contactNumber.includes(searchTerm) ||
+        order.deliveryAddress.toLowerCase().includes(searchTerm) ||
+        order.orderDetails.some(detail => 
+            detail.product && detail.product.productName.toLowerCase().includes(searchTerm)
+        )
+    );
+}
+
 // Update the loadOrders function
 async function loadOrders() {
     try {
         const dateFilter = document.getElementById('orderDateFilter').value;
+        const searchTerm = document.getElementById('orderSearchInput').value;
         let url = 'http://localhost:4000/api/orders';
         
         if (dateFilter) {
@@ -298,12 +327,9 @@ async function loadOrders() {
         // Get the token from localStorage
         const token = localStorage.getItem('token');
         if (!token) {
-            // Redirect to login if no token
             window.location.href = '/frontend/login.html';
             return;
         }
-        
-        console.log('Fetching orders from:', url); // Debug log
         
         const response = await fetch(url, {
             method: 'GET',
@@ -313,20 +339,17 @@ async function loadOrders() {
             }
         });
 
-        if (response.status === 401) {
-            // Token expired or invalid
-            localStorage.removeItem('token');
-            window.location.href = '/frontend/login.html';
-            return;
-        }
-
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const orders = await response.json();
-        console.log('Received orders:', orders); // Debug log
+        let orders = await response.json();
         
+        // Apply search filter if search term exists
+        if (searchTerm) {
+            orders = searchOrders(orders, searchTerm);
+        }
+
         const userDetailsTable = document.getElementById('userDetails');
         userDetailsTable.innerHTML = '';
 
@@ -336,7 +359,8 @@ async function loadOrders() {
                 <tr>
                     <td colspan="8" class="text-center py-4">
                         <i class="fa fa-info-circle me-2"></i>
-                        ${dateFilter ? 'No orders found for selected date' : 'No orders found'}
+                        ${searchTerm ? 'No orders found matching your search' : 
+                          dateFilter ? 'No orders found for selected date' : 'No orders found'}
                     </td>
                 </tr>
             `;
@@ -736,6 +760,23 @@ window.onload = function() {
     
     loadOrders();
     loadProducts();
+
+    // Add search input event listener
+    const searchInput = document.getElementById('orderSearchInput');
+    let searchTimeout;
+    
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            loadOrders();
+        }, 300); // Debounce the search to avoid too many requests
+    });
+
+    // Add clear search button functionality
+    document.getElementById('clearSearch').addEventListener('click', function() {
+        document.getElementById('orderSearchInput').value = '';
+        loadOrders();
+    });
 };
 
 // Add event listener for date filter changes
