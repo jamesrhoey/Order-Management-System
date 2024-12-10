@@ -46,114 +46,32 @@ body {
     box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3);
 }
 
-/* Modern Logo and Brand Styling */
-.logo-container {
-    background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
-    width: 45px;
-    height: 45px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-}
-
-.logo-container::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
-    border-radius: inherit;
-}
-
-.logo-icon-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.logo-icon-main {
-    color: #ffffff;
-    font-size: 20px;
-    z-index: 2;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-}
-
-.logo-icon-accent {
-    color: #00e5ff;
-    font-size: 12px;
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    transform: rotate(-45deg);
-    z-index: 3;
-    filter: drop-shadow(0 0 8px rgba(0,229,255,0.5));
-}
-
-.brand-text {
-    display: flex;
-    flex-direction: column;
-    margin-left: 2px;
-}
-
-.brand-name {
-    font-size: 1.4rem;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    color: #ffffff;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    line-height: 1.2;
-}
-
-.text-accent {
-    background: linear-gradient(to right, #00e5ff, #00b8d4);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 800;
-}
-
-.brand-tagline {
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.7);
-    letter-spacing: 0.5px;
-    margin-top: 2px;
-    font-weight: 400;
-}
-
-/* Hover Animation */
-.sidebar a:hover .logo-container {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+/* Logo Styling */
+.logo-wrapper {
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
     transition: all 0.3s ease;
+    margin: 0.5rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.sidebar a:hover .logo-icon-accent {
-    animation: sparkle 1s ease-in-out;
+.logo-wrapper:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-@keyframes sparkle {
-    0% { transform: rotate(-45deg) scale(1); opacity: 1; }
-    50% { transform: rotate(-45deg) scale(1.5); opacity: 0.7; }
-    100% { transform: rotate(-45deg) scale(1); opacity: 1; }
+.logo-wrapper img {
+    max-height: 45px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
-/* Dark mode optimization */
-@media (prefers-color-scheme: dark) {
-    .logo-container {
-        background: linear-gradient(135deg, #2d2d2d, #1a1a1a);
-    }
-}
-
-
-
-
+/* Remove or comment out the old logo styles */
+/* .logo-container, .logo-container::after, .logo-icon-wrapper, 
+.logo-icon-main, .logo-icon-accent, .brand-text, .brand-name, 
+.text-accent, .brand-tagline, .sidebar a:hover .logo-container, 
+.sidebar a:hover .logo-icon-accent, @keyframes sparkle */
 
 .product-card {
     background-color: #1e3a1e;
