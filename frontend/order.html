@@ -319,7 +319,7 @@ async function loadOrders() {
     try {
         const dateFilter = document.getElementById('orderDateFilter').value;
         const searchTerm = document.getElementById('orderSearchInput').value;
-        let url = 'http://localhost:4000/api/orders';
+        let url = 'https://order-management-system-production-0adb.up.railway.app/api/orders';
         
         if (dateFilter) {
             url += `?date=${dateFilter}`;
