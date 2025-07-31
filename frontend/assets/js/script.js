@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Fetch products from the backend API and populate the table
 async function fetchProducts() {
     try {
-        const response = await fetch('http://localhost:4000/api/products/');
+        const response = await fetch('https://order-management-system-production-0adb.up.railway.app/api/products/');
         if (!response.ok) {
             throw new Error('Failed to fetch products');
         }

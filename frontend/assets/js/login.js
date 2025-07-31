@@ -15,7 +15,7 @@ async function handleLogin(e) {
             }
         });
 
-        const response = await fetch('http://localhost:4000/api/auth/login', {
+        const response = await fetch('https://order-management-system-production-0adb.up.railway.app/api/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -141,7 +141,7 @@
 
     async function fetchTransactions() {
         try {
-            const response = await fetch('http://localhost:4000/api/transactions');
+            const response = await fetch('https://order-management-system-production-0adb.up.railway.app/api/transactions');
             
             if (!response.ok) {
                 console.log('Response status:', response.status);
@@ -381,7 +381,7 @@
     // Add new function for printing all transactions
     async function printAllTransactions() {
         try {
-            const response = await fetch('http://localhost:4000/api/transactions');
+            const response = await fetch('https://order-management-system-production-0adb.up.railway.app/api/transactions');
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const result = await response.json();
             const transactions = result.data;
@@ -454,7 +454,7 @@
     // Keep the existing printTransactions function
     async function printTransactions() {
         try {
-            const response = await fetch('http://localhost:4000/api/transactions');
+            const response = await fetch('https://order-management-system-production-0adb.up.railway.app/api/transactions');
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const result = await response.json();
             let transactions = result.data;
@@ -534,7 +534,7 @@
 
     // Make sure to call displayTransactions whenever you load or update the transactions
     // For example:
-    fetch('http://localhost:4000/api/transactions')
+    fetch('https://order-management-system-production-0adb.up.railway.app/api/transactions')
         .then(response => response.json())
         .then(result => {
             const transactions = result.data;

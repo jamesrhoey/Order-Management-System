@@ -1,5 +1,5 @@
 // API URL
-const API_URL = 'http://localhost:4000/api';
+const API_URL = 'https://order-management-system-production-0adb.up.railway.app/api';
 
 // Add these variables at the top of the file
 const ITEMS_PER_PAGE = 7;
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-                const response = await fetch('http://localhost:4000/api/products', {
+                const response = await fetch('https://order-management-system-production-0adb.up.railway.app/api/products', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

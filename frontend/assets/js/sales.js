@@ -1,5 +1,5 @@
 // Constants
-const API_URL = 'http://localhost:4000/api';
+const API_URL = 'https://order-management-system-production-0adb.up.railway.app/api';
 
 // Function to fetch sales data
 async function fetchSales() {
