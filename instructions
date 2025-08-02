@@ -1,0 +1,13 @@
+order management system
+
+1. login.html - username: admin, password: admin
+2. index.html   - view sales monthly, weekly, view pending orders for 3 days
+3. order.html   - view all orders, add new order, update order, delete order
+4. transaction.html - view all transactions
+5. profile.html     - view profile, change password
+
+based on the requirements, the system will be able to manage orders, sales, and transactions of a business.
+create a ai that will give sales insights based on the data, order prediction, and transaction prediction.
+
+
+

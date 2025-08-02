@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <title>Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary-color: #0a2f25;
+            --secondary-color: #0d3d30;
+            --accent-color: #00e5ff;
+            --text-light: #ffffff;
+            --card-bg: #ffffff;
+            --gradient-dark: linear-gradient(135deg, #0a2f25, #0d3d30);
+            --gradient-light: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+        }
+
+        body {
+            background: var(--primary-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            background: #0a1f1a !important;
+            min-width: 250px;
+            padding: 20px 0;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar-collapse {
+            width: 80px;
+            overflow: hidden;
+        }
+        
+        .sidebar-collapse .nav-link span {
+            display: none;
+        }
+        
+        .sidebar-collapse .logo-wrapper {
+            padding: 8px;
+        }
+        
+        .sidebar-collapse .logo-wrapper img {
+            max-height: 40px;
+        }
+        
+        .sidebar-collapse .dropdown.open span {
+            display: none;
+        }
+
+        .sidebar .nav-link {
+            position: relative;
+            padding: 12px 20px;
+            margin: 4px 15px;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+        }
+
+        .sidebar .nav-link:hover {
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link.active {
+            background: linear-gradient(135deg, #00e5ff, #00b8d4);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            transition: margin-left 0.3s ease;
+            margin-left: 250px;
+        }
+
+        .dashboard-header {
+            background: var(--gradient-dark);
+            padding: 25px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Card Styling */
+        .order-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+                min-width: 80px;
+            }
+            
+            .sidebar .nav-link {
+                padding: 12px;
+                margin: 4px 8px;
+                justify-content: center;
+            }
+            
+            .sidebar .nav-link span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 80px !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+                padding-top: 70px;
+            }
+            
+            .sidebar-toggle {
+                display: block !important;
+                position: fixed;
+                left: 15px;
+                top: 15px;
+                z-index: 1001;
+                background: var(--primary-color);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
+                cursor: pointer;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            }
+
+            .dashboard-header {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+        }
+
+        /* Icon Styling */
+        .icon-wrapper {
+            position: relative;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-main {
+            font-size: 18px;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .icon-notification {
+            position: absolute;
+            font-size: 8px;
+            top: 0;
+            right: 0;
+            opacity: 0;
+            transform: translate(25%, -25%);
+            transition: all 0.3s ease;
+            color: #00e5ff;
+        }
+
+        .nav-link:hover .icon-main {
+            transform: scale(1.1);
+        }
+
+        .nav-link:hover .icon-notification {
+            opacity: 1;
+            animation: pulse 1.5s infinite;
+        }
+
+        .nav-link.active .icon-main {
+            transform: scale(1.1);
+        }
+
+        .nav-link.active .icon-notification {
+            opacity: 1;
+            color: #ffffff;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(25%, -25%) scale(1); }
+            50% { transform: translate(25%, -25%) scale(1.2); }
+            100% { transform: translate(25%, -25%) scale(1); }
+        }
+
+        /* Logo Styling */
+        .logo-wrapper {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin: 0.5rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-wrapper:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-wrapper img {
+            max-height: 45px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Mobile Menu Toggle Button -->
+    <button class="sidebar-toggle d-none">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <!-- Sidebar -->
+            <div class="sidebar col-auto min-vh-100 d-flex flex-column justify-content-between">
+                <div class="p-2">
+                    <a href="index.html" class="d-flex text-decoration-none mt-1 align-items-center justify-content-center">
+                        <div class="logo-wrapper p-2 bg-white rounded-3 shadow-sm">
+                            <img src="assets/images/download.jpg" alt="SimpliServe Logo" class="img-fluid">
+                        </div>
+                    </a>
+                    <ul class="nav nav-pills flex-column mt-4">
+                        <li class="nav-item py-2 py-sm-0">
+                            <a href="index.html" class="nav-link active text-white">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-chart-line icon-main"></i>
+                                        <i class="fas fa-circle icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3">Dashboard</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item py-2 py-sm-0">
+                            <a href="order.html" class="nav-link text-white">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-shopping-bag icon-main"></i>
+                                        <i class="fas fa-plus icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3">Orders</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item py-2 py-sm-0">
+                            <a href="product.html" class="nav-link text-white">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-box-open icon-main"></i>
+                                        <i class="fas fa-tag icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3">Products</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item py-2 py-sm-0">
+                            <a href="transaction.html" class="nav-link text-white">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-receipt icon-main"></i>
+                                        <i class="fas fa-check icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3">Transactions</span>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="dropdown open p-3">
+                    <a href="profile.html" class="btn text-white">
+                        <i class="fa-solid fa-user"></i><span class="ms-2">Profile</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col py-3 main-content">
+                <div class="dashboard-header">
+                    <h3 class="m-0">Dashboard Overview</h3>
+                </div>
+                
+                <div class="col-12 px-0 px-md-4">
+                    <div class="container-fluid">
+                        <!-- Pending Orders Header -->
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+                            <div class="d-flex align-items-center mb-3 mb-md-0">
+                                <i class="fas fa-clock text-warning me-2 fs-4"></i>
+                                <h4 class="mb-0 text-primary fw-bold">Pending Orders</h4>
+                            </div>
+                            <div class="badge bg-warning text-light px-3 py-2">
+                                <i class="fas fa-info-circle me-1"></i>
+                                <span class="d-none d-sm-inline">Showing pending orders from the last 3 days</span>
+                                <span class="d-inline d-sm-none">Last 3 days</span>
+                            </div>
+                        </div>
+                        <div class="row g-4" id="pendingOrdersContainer">
+                            <!-- Pending orders will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Summary Modal -->
+                <div class="modal fade" id="orderSummaryModal" tabindex="-1" aria-labelledby="orderSummaryModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background-color: #1a1a1a; color: white;">
+                                <h5 class="modal-title" id="orderSummaryModalLabel">
+                                    <i class="fas fa-clipboard-list me-2"></i>Order Summary
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body p-4">
+                                <div class="summary-content">
+                                    <div class="customer-info mb-4">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-user-circle fs-4 me-2 text-primary"></i>
+                                            <h5 class="customer-name mb-0 fw-bold"></h5>
+                                        </div>
+                                    </div>
+                                    <div class="order-details mb-4">
+                                        <h6 class="fw-bold mb-3">Order Items:</h6>
+                                        <div class="order-items-list"></div>
+                                    </div>
+                                    <div class="ingredients-section">
+                                        <h6 class="fw-bold mb-3">Ingredients Required:</h6>
+                                        <div class="ingredients-list"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle sidebar on mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            
+            // Show/hide toggle button based on screen size
+            function checkScreenSize() {
+                if (window.innerWidth <= 768) {
+                    sidebarToggle.classList.remove('d-none');
+                } else if (window.innerWidth <= 992) {
+                    sidebarToggle.classList.add('d-none');
+                    sidebar.classList.add('sidebar-collapse');
+                } else {
+                    sidebarToggle.classList.add('d-none');
+                    sidebar.classList.remove('sidebar-collapse');
+                }
+            }
+            
+            // Initial check
+            checkScreenSize();
+            
+            // Toggle sidebar on button click
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('show');
+            });
+            
+            // Check screen size on resize
+            window.addEventListener('resize', checkScreenSize);
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 768 && 
+                    !sidebar.contains(event.target) && 
+                    !sidebarToggle.contains(event.target)) {
+                    sidebar.classList.remove('show');
+                }
+            });
+
+            // API URL
+            const API_URL = 'https://order-management-system-production-0adb.up.railway.app/api';
+
+            // Fetch pending orders
+            async function fetchOrders() {
+                try {
+                    console.log('Fetching orders...');
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                        throw new Error('No authentication token found');
+                    }
+
+                    const response = await fetch(`${API_URL}/orders`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const orders = await response.json();
+                    console.log('Received orders:', orders);
+
+                    const today = new Date();
+                    today.setHours(23, 59, 59, 999);
+                    
+                    const threeDaysAgo = new Date(today);
+                    threeDaysAgo.setDate(today.getDate() - 2);
+                    threeDaysAgo.setHours(0, 0, 0, 0);
+
+                    const pendingOrders = orders.filter(order => {
+                        const orderDate = new Date(order.orderDate);
+                        return orderDate >= threeDaysAgo && 
+                               orderDate <= today && 
+                               order.status.toLowerCase() === 'pending';
+                    });
+
+                    console.log('Pending orders:', pendingOrders);
+                    const groupedOrders = groupOrdersByDate(pendingOrders);
+                    displayPendingOrders(groupedOrders);
+
+                } catch (error) {
+                    console.error('Error fetching orders:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to load pending orders: ' + error.message
+                    });
+                }
+            }
+
+            function groupOrdersByDate(orders) {
+                const groups = {};
+                orders.forEach(order => {
+                    const date = new Date(order.orderDate).toISOString().split('T')[0];
+                    if (!groups[date]) {
+                        groups[date] = [];
+                    }
+                    groups[date].push(order);
+                });
+                return groups;
+            }
+
+            function displayPendingOrders(groupedOrders) {
+                const container = document.getElementById('pendingOrdersContainer');
+                container.innerHTML = '';
+
+                if (Object.keys(groupedOrders).length === 0) {
+                    container.innerHTML = `
+                        <div class="col-12">
+                            <div class="alert alert-info text-center">
+                                <i class="fas fa-info-circle me-2"></i>
+                                No pending orders found for the last 3 days
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const sortedDates = Object.keys(groupedOrders).sort().reverse();
+
+                sortedDates.forEach(date => {
+                    const orders = groupedOrders[date];
+                    const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+
+                    container.innerHTML += `
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="card shadow-sm order-card" onclick="showDayOrderSummary('${date}', ${JSON.stringify(orders).replace(/'/g, "\\'").replace(/"/g, '&quot;')})">
+                                <div class="card-header bg-white">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-calendar-day me-2"></i>${formattedDate}
+                                        </h5>
+                                        <span class="badge bg-warning text-light">
+                                            ${orders.length} Orders
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="card-body" style="min-height: 150px; max-height: 300px; overflow-y: auto;">
+                                    <div class="order-list">
+                                        ${orders.map(order => `
+                                            <div class="order-item mb-3 p-2 border-bottom">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <i class="fas fa-user-circle text-primary me-2"></i>
+                                                    <span class="fw-bold">${order.customerName}</span>
+                                                </div>
+                                                <div class="ms-4">
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-clock me-1"></i>${order.orderTime || 'N/A'}
+                                                    </small>
+                                                    <div class="mt-1">
+                                                        ${order.orderDetails.map(detail => `
+                                                            <div class="text-truncate">
+                                                                <i class="fas fa-utensils me-1"></i>
+                                                                ${detail.price ? `Item (₱${detail.price})` : 'Unknown Item'} x${detail.quantity || 1}
+                                                            </div>
+                                                        `).join('')}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            window.showDayOrderSummary = function(date, orders) {
+                const ingredientTotals = {};
+                
+                orders.forEach(order => {
+                    order.orderDetails.forEach(detail => {
+                        if (detail.product && Array.isArray(detail.product.ingredients)) {
+                            detail.product.ingredients.forEach(ingredient => {
+                                const quantity = detail.quantity || 1;
+                                if (ingredientTotals[ingredient]) {
+                                    ingredientTotals[ingredient] += quantity;
+                                } else {
+                                    ingredientTotals[ingredient] = quantity;
+                                }
+                            });
+                        }
+                    });
+                });
+
+                const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                const modalContent = `
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">
+                            <i class="fas fa-calendar-day me-2"></i>
+                            Pending Orders Summary - ${formattedDate}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold mb-3">
+                                    <i class="fas fa-list me-2"></i>Orders (${orders.length})
+                                </h6>
+                                <div class="order-list">
+                                    ${orders.map(order => `
+                                        <div class="order-item mb-3 p-3 border rounded">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="fw-bold">${order.customerName}</span>
+                                                <small class="text-muted">${order.orderTime || 'N/A'}</small>
+                                            </div>
+                                            <div class="products-list">
+                                                ${order.orderDetails.map(detail => `
+                                                    <div class="product-item">
+                                                        <i class="fas fa-utensils me-2"></i>
+                                                        ${detail.product ? detail.product.productName : 'Unknown Product'} x${detail.quantity || 1}
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="fw-bold mb-3">
+                                    <i class="fas fa-shopping-basket me-2"></i>Total Ingredients Needed
+                                </h6>
+                                <div class="ingredients-list">
+                                    ${Object.entries(ingredientTotals).map(([ingredient, quantity]) => `
+                                        <div class="ingredient-item d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
+                                            <div>
+                                                <i class="fas fa-carrot me-2"></i>
+                                                ${ingredient}
+                                            </div>
+                                            <span class="badge bg-primary">${quantity} units</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                `;
+
+                const modal = document.getElementById('orderSummaryModal');
+                modal.querySelector('.modal-content').innerHTML = modalContent;
+                new bootstrap.Modal(modal).show();
+            }
+
+            // Initialize on page load
+            fetchOrders();
+        });
+    </script>
+</body>
+</html>

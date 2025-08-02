@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/order.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <title>Order Management</title>
+    <style>
+        /* Mobile-first responsive styles */
+        .sidebar-collapse {
+            width: 80px;
+            overflow: hidden;
+        }
+        
+        .sidebar-collapse .nav-link span {
+            display: none;
+        }
+        
+        .sidebar-collapse .logo-wrapper {
+            padding: 8px;
+        }
+        
+        .sidebar-collapse .logo-wrapper img {
+            max-height: 40px;
+        }
+        
+        .sidebar-collapse .dropdown.open span {
+            display: none;
+        }
+        
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            left: 10px;
+            top: 10px;
+            z-index: 1001;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+                min-width: 80px;
+            }
+            
+            .sidebar .nav-link {
+                padding: 12px;
+                margin: 4px 8px;
+                justify-content: center;
+            }
+            
+            .sidebar .nav-link span {
+                display: none;
+            }
+            
+            .sidebar .logo-wrapper {
+                margin: 0.5rem;
+            }
+            
+            .main-content {
+                margin-left: 80px !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                z-index: 1000;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+                padding-top: 60px !important;
+            }
+            
+            .sidebar-toggle {
+                display: block;
+            }
+            
+            .header-actions {
+                flex-direction: column !important;
+                gap: 10px !important;
+            }
+            
+            .header-actions .input-group {
+                width: 100% !important;
+            }
+            
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .table th, .table td {
+                white-space: nowrap;
+            }
+            
+            .action-buttons {
+                display: flex;
+                gap: 5px;
+            }
+            
+            .action-buttons .btn {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .modal-dialog {
+                margin: 0.5rem;
+                width: calc(100% - 1rem);
+            }
+            
+            .table thead {
+                display: none;
+            }
+            
+            .table tbody tr {
+                display: block;
+                margin-bottom: 1rem;
+                border: 1px solid #dee2e6;
+                border-radius: 0.25rem;
+            }
+            
+            .table tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.5rem;
+                border: none;
+                border-bottom: 1px solid #dee2e6;
+            }
+            
+            .table tbody td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                margin-right: 1rem;
+            }
+            
+            .table tbody td:last-child {
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Mobile Menu Toggle Button -->
+    <button class="sidebar-toggle d-none">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="container-fluid vh-100 overflow-hidden">
+        <div class="row flex-nowrap h-100">
+            <!-- Sidebar -->
+            <div class="sidebar col-auto min-vh-100 d-flex flex-column justify-content-between">
+                <div class="p-2">
+                    <a href="" class="d-flex text-decoration-none mt-1 align-items-center justify-content-center">
+                        <div class="logo-wrapper p-2 bg-white rounded-3 shadow-sm" style="transition: all 0.3s ease;">
+                            <img src="assets/images/download.jpg" alt="SimpliServe Logo" class="img-fluid" style="max-height: 45px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
+                        </div>
+                    </a>
+                    <ul class="nav nav-pills flex-column mt-4">
+                        <li class="nav-item py-2 py-sm-0">
+                            <a href="index.html" class="nav-link text-white">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-chart-line icon-main"></i>
+                                        <i class="fas fa-circle icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3">Dashboard</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item py-2 py-sm-0">
+                            <a href="order.html" class="nav-link active text-white">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-shopping-bag icon-main"></i>
+                                        <i class="fas fa-plus icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3">Orders</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item py-2 py-sm-0">
+                            <a href="product.html" class="nav-link text-white">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-box-open icon-main"></i>
+                                        <i class="fas fa-tag icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3">Products</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item py-2 py-sm-0">
+                            <a href="transaction.html" class="nav-link text-white">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-receipt icon-main"></i>
+                                        <i class="fas fa-check icon-notification"></i>
+                                    </div>
+                                    <span class="fs-5 ms-3">Transactions</span>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="dropdown open p-3">
+                    <a href="profile.html" class="btn text-white">
+                        <i class="fa-solid fa-user"></i><span class="ms-2">Profile</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <section class="container col-auto col-sm-6 col-md-10 g-2 h-100 d-flex flex-column p-0">
+                <!-- Fixed header area -->
+                <div class="d-flex justify-content-between align-items-center mb-4 p-4 header-actions">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addOrderModal">
+                        <i class="fas fa-plus me-2"></i><span class="d-none d-sm-inline">Add Order</span>
+                    </button>
+                    
+                    <div class="d-flex gap-2 align-items-center flex-wrap">
+                        <div class="me-3">
+                            <div class="input-group">
+                                <input type="text" id="orderSearchInput" class="form-control" placeholder="Search orders...">
+                                <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <label for="orderDateFilter" class="form-label mb-0 me-2 d-none d-sm-block">Filter by date:</label>
+                            <input type="date" id="orderDateFilter" class="form-control" style="width: auto;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scrollable content area -->
+                <div class="flex-grow-1 overflow-auto px-2 px-md-4">
+                    <div class="table-responsive wrapper rounded-3 shadow-sm">
+                        <table class="table table-hover align-middle mb-0 bg-white">
+                            <thead>
+                                <tr class="text-center" style="background-color: #f8f9fa;">
+                                    <th class="py-3">OrderId</th>
+                                    <th class="py-3">Customer</th>
+                                    <th class="py-3 d-none d-md-table-cell">Date</th>
+                                    <th class="py-3 d-none d-sm-table-cell">Time</th>
+                                    <th class="py-3 d-none d-lg-table-cell">Payment</th>
+                                    <th class="py-3">Details</th>
+                                    <th class="py-3">Status</th>
+                                    <th class="py-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center" id="userDetails">
+                                <!-- Orders will be populated here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Add Order Modal -->
+    <div class="modal fade" id="addOrderModal" tabindex="-1" aria-labelledby="addOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #1a1a1a; color: white;">
+                    <h5 class="modal-title" id="addOrderModalLabel">
+                        <i class="fa fa-plus-circle me-2"></i>Add New Order
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-3 p-md-4">
+                    <form id="addOrderForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="customerName" class="form-label fw-bold">
+                                    <i class="fa fa-user me-2"></i>Customer Name
+                                </label>
+                                <input type="text" class="form-control shadow-sm" id="customerName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="contactNumber" class="form-label fw-bold">
+                                    <i class="fa fa-phone me-2"></i>Contact Number
+                                </label>
+                                <input type="text" class="form-control shadow-sm" id="contactNumber" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="deliveryAddress" class="form-label fw-bold">
+                                <i class="fa fa-location-dot me-2"></i>Delivery Address
+                            </label>
+                            <input type="text" class="form-control shadow-sm" id="deliveryAddress" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fa fa-cart-shopping me-2"></i>Select Products
+                            </label>
+                            <div class="row g-3" id="productCheckboxContainer">
+                                <!-- Products will be populated here dynamically -->
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label fw-bold">
+                                <i class="fa fa-note-sticky me-2"></i>Notes
+                            </label>
+                            <textarea class="form-control shadow-sm" id="notes" rows="2"></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="paymentMethod" class="form-label fw-bold">
+                                <i class="fa fa-credit-card me-2"></i>Payment Method
+                            </label>
+                            <select class="form-select shadow-sm" id="paymentMethod" required>
+                                <option value="" selected disabled>Select payment method</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Gcash">Gcash</option>
+                            </select>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-save me-2"></i>Save Order
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Order Modal -->
+    <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title" id="editOrderModalLabel">Edit Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editOrderForm">
+                        <div class="mb-3">
+                            <label for="editCustomerName" class="form-label">Customer Name</label>
+                            <input type="text" class="form-control" id="editCustomerName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDeliveryAddress" class="form-label">Delivery Address</label>
+                            <input type="text" class="form-control" id="editDeliveryAddress" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editContactNumber" class="form-label">Contact Number</label>
+                            <input type="text" class="form-control" id="editContactNumber" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editProductSelect" class="form-label">Select Products</label>
+                            <div id="editProductSelect">
+                                <label><input type="checkbox" class="product-checkbox" value="Adobowow"> Adobowow</label><br>
+                                <label><input type="checkbox" class="product-checkbox" value="Sinugnog"> Sinugnog</label><br>
+                                <label><input type="checkbox" class="product-checkbox" value="Kalebayor"> Kalebayor</label><br>
+                                <label><input type="checkbox" class="product-checkbox" value="Sinalsale"> Sinalsale</label><br>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editNotes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="editNotes" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPaymentMethod" class="form-label">Payment Method</label>
+                            <select class="form-control" id="editPaymentMethod" required>
+                                <option value="Cash">Cash</option>
+                                <option value="Gcash">Gcash</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-warning">Update Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Order Details Modal -->
+    <div class="modal fade" id="viewOrderDetailsModal" tabindex="-1" aria-labelledby="viewOrderDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #1a1a1a; color: white;">
+                    <h5 class="modal-title" id="viewOrderDetailsModalLabel">
+                        <i class="fa fa-info-circle me-2"></i>Order Details
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Products:</h6>
+                        <p id="viewOrderProducts"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Notes:</h6>
+                        <p id="viewOrderNotes"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Delivery Address:</h6>
+                        <p id="viewDeliveryAddress"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Contact Number:</h6>
+                        <p id="viewContactNumber"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+let orderIdCounter = 1; // Keeps track of order IDs
+let editingOrderIndex = null; // Tracks the index of the order being edited
+
+// Add this function before the loadOrders function
+function viewOrderDetails(orderId, products, notes, deliveryAddress, contactNumber) {
+    document.getElementById('viewOrderProducts').textContent = products;
+    document.getElementById('viewOrderNotes').textContent = notes || 'No notes provided';
+    document.getElementById('viewDeliveryAddress').textContent = deliveryAddress;
+    document.getElementById('viewContactNumber').textContent = contactNumber;
+    
+    const modal = new bootstrap.Modal(document.getElementById('viewOrderDetailsModal'));
+    modal.show();
+}
+
+// Add these functions before the loadOrders function
+function searchOrders(orders, searchTerm) {
+    if (!searchTerm) return orders;
+    
+    searchTerm = searchTerm.toLowerCase();
+    return orders.filter(order => 
+        order.customerName.toLowerCase().includes(searchTerm) ||
+        order._id.toLowerCase().includes(searchTerm) ||
+        order.contactNumber.includes(searchTerm) ||
+        order.deliveryAddress.toLowerCase().includes(searchTerm) ||
+        order.orderDetails.some(detail => 
+            detail.product && detail.product.productName.toLowerCase().includes(searchTerm)
+        )
+    );
+}
+
+// Update the loadOrders function
+async function loadOrders() {
+    try {
+        const dateFilter = document.getElementById('orderDateFilter').value;
+        const searchTerm = document.getElementById('orderSearchInput').value;
+        let url = 'https://order-management-system-production-0adb.up.railway.app/api/orders';
+        
+        if (dateFilter) {
+            url += `?date=${dateFilter}`;
+        }
+        
+        // Get the token from localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/frontend/login.html';
+            return;
+        }
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        let orders = await response.json();
+        
+        // Apply search filter if search term exists
+        if (searchTerm) {
+            orders = searchOrders(orders, searchTerm);
+        }
+
+        const userDetailsTable = document.getElementById('userDetails');
+        userDetailsTable.innerHTML = '';
+
+        // If no orders found, show message
+        if (!orders || orders.length === 0) {
+            userDetailsTable.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-4">
+                        <i class="fa fa-info-circle me-2"></i>
+                        ${searchTerm ? 'No orders found matching your search' : 
+                          dateFilter ? 'No orders found for selected date' : 'No orders found'}
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        orders.forEach((order, index) => {
+            // Format the date and time
+            const orderDate = order.orderDate ? new Date(order.orderDate).toLocaleDateString() : 'N/A';
+            const orderTime = order.orderTime || 'N/A';
+            
+            // Get product details
+            const orderDetails = order.orderDetails
+                .map(detail => detail.product ? detail.product.productName : 'Unknown Product')
+                .join(', ');
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="fw-bold">${order._id.slice(-4)}</td>
+                <td data-label="Customer">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-user-circle text-primary d-sm-none" style="font-size: 1.2rem;"></i>
+                            <div class="text-truncate" style="max-width: 120px;" title="${order.customerName}">
+                                ${order.customerName}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td class="d-none d-md-table-cell" data-label="Date">${orderDate}</td>
+                <td class="d-none d-sm-table-cell" data-label="Time">${orderTime}</td>
+                <td class="d-none d-lg-table-cell" data-label="Payment">
+                    <span class="badge ${getPaymentMethodBadgeClass(order.paymentMethod)}">
+                        ${order.paymentMethod}
+                    </span>
+                </td>
+                <td data-label="Details">
+                    <a href="#" class="text-primary text-decoration-none" 
+                       onclick="viewOrderDetails('${order._id}', \`${orderDetails}\`, \`${order.notes || ''}\`, \`${order.deliveryAddress}\`, \`${order.contactNumber}\`)">
+                        <i class="fas fa-eye me-1"></i><span class="d-none d-sm-inline">View</span>
+                    </a>
+                </td>
+                <td data-label="Status">
+                    <span class="badge ${getStatusBadgeClass(order.status)}">
+                        ${order.status}
+                    </span>
+                </td>
+                <td data-label="Actions" class="action-buttons">
+                    <button class="btn btn-warning btn-sm" onclick="editOrder('${order._id}')">
+                        <i class="fa fa-edit"></i><span class="d-none d-sm-inline"> Edit</span>
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteOrder('${order._id}')">
+                        <i class="fa fa-trash"></i><span class="d-none d-sm-inline"> Delete</span>
+                    </button>
+                </td>
+            `;
+            userDetailsTable.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Error loading orders:', error);
+        if (error.message.includes('401')) {
+            // If unauthorized, redirect to login
+            window.location.href = '/frontend/login.html';
+            return;
+        }
+        const userDetailsTable = document.getElementById('userDetails');
+        userDetailsTable.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center text-danger">
+                    <i class="fa fa-exclamation-circle me-2"></i>
+                    Failed to load orders: ${error.message}
+                </td>
+            </tr>
+        `;
+    }
+}
+
+// Helper function to get the appropriate badge class based on status
+function getStatusBadgeClass(status) {
+    if (!status) return 'bg-secondary'; // Default case for null/undefined status
+    
+    switch (status.toLowerCase()) {
+        case 'pending':
+            return 'bg-warning text-dark';
+        case 'completed':
+            return 'bg-success';
+        case 'cancelled':
+            return 'bg-danger';
+        default:
+            return 'bg-secondary';
+    }
+}
+
+// Update the payment method badge helper function
+function getPaymentMethodBadgeClass(method) {
+    if (!method) return 'bg-secondary';
+    
+    switch (method.toLowerCase()) {
+        case 'cash':
+            return 'bg-success';
+        case 'gcash':
+            return 'bg-primary';
+        default:
+            return 'bg-secondary';
+    }
+}
+
+// Update the Add Order form submission handler
+document.getElementById('addOrderForm').addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    try {
+        const customerName = document.getElementById('customerName').value;
+        const deliveryAddress = document.getElementById('deliveryAddress').value;
+        const contactNumber = document.getElementById('contactNumber').value;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const notes = document.getElementById('notes').value;
+
+        // Get selected products with their MongoDB IDs
+        const selectedProducts = Array.from(document.querySelectorAll('.product-checkbox:checked'))
+            .map(checkbox => ({
+                productId: checkbox.value,  // This will now be the MongoDB _id
+                productName: checkbox.dataset.name
+            }));
+
+    if (selectedProducts.length === 0) {
+        alert("Please select at least one product.");
+        return;
+    }
+
+        const orderData = {
+            customerName,
+            deliveryAddress,
+            contactNumber,
+            paymentMethod,
+            products: selectedProducts.map(p => p.productId), // Send only the MongoDB IDs
+            notes,
+            orderDate: new Date().toISOString().split('T')[0],
+            orderTime: new Date().toTimeString().split(' ')[0],
+            status: 'Pending'
+        };
+
+        console.log('Sending order data:', orderData); // Debug log
+
+        const response = await fetch('https://order-management-system-production-0adb.up.railway.app/api/orders', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(orderData)
+        });
+
+        const responseData = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(`Server Error: ${responseData.message || 'Unknown error'}`);
+        }
+
+        // Success handling
+        const addModal = bootstrap.Modal.getInstance(document.getElementById('addOrderModal'));
+        addModal.hide();
+        this.reset();
+        
+        // Call loadOrders to refresh the table
+        await loadOrders();
+        
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Order added successfully!'
+        });
+
+    } catch (error) {
+        console.error('Full error details:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error Adding Order',
+            text: error.message
+        });
+    }
+});
+
+// Update the loadProducts function
+async function loadProducts() {
+    try {
+        const response = await fetch('https://order-management-system-production-0adb.up.railway.app/api/products', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const products = await response.json();
+        
+        const container = document.getElementById('productCheckboxContainer');
+        container.innerHTML = '';
+        
+        products.forEach((product, index) => {
+            if (index % 2 === 0) {
+                container.innerHTML += `<div class="col-md-6">`;
+            }
+            
+            const productHtml = `
+                <div class="form-check custom-checkbox">
+                    <input type="checkbox" class="form-check-input product-checkbox" 
+                           value="${product._id}" 
+                           data-name="${product.productName}"
+                           id="product_${product._id}">
+                    <label class="form-check-label" for="product_${product._id}">
+                        ${product.productName} - ₱${product.price}
+                    </label>
+                </div>
+            `;
+            
+            container.lastElementChild.innerHTML += productHtml;
+            
+            if (index % 2 === 1 || index === products.length - 1) {
+                container.innerHTML += `</div>`;
+            }
+        });
+    } catch (error) {
+        console.error('Error loading products:', error);
+        const container = document.getElementById('productCheckboxContainer');
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                Failed to load products. Please try again later.
+                Error: ${error.message}
+            </div>
+        `;
+    }
+}
+
+// Function to hndle Edit Ordera form submission
+document.getElementById('editOrderForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const customerName = document.getElementById('editCustomerName').value;
+    const deliveryAddress = document.getElementById('editDeliveryAddress').value;
+    const contactNumber = document.getElementById('editContactNumber').value;
+    const paymentMethod = document.getElementById('editPaymentMethod').value;
+
+    const selectedProducts = Array.from(document.querySelectorAll('.edit-product-checkbox:checked'))
+        .map(checkbox => checkbox.value);
+
+    if (selectedProducts.length === 0) {
+        alert("Please select at least one product.");
+        return;
+    }
+
+    const orderDetails = selectedProducts.join(", ");
+
+    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+    orders[editingOrderIndex] = {
+        ...orders[editingOrderIndex], // Keep existing orderId and other details
+        customerName,
+        deliveryAddress,
+        contactNumber,
+        paymentMethod,
+        orderDetails
+    };
+
+    localStorage.setItem("orders", JSON.stringify(orders));
+    loadOrders();
+
+    const editModal = bootstrap.Modal.getInstance(document.getElementById('editOrderModal'));
+    editModal.hide();
+    document.getElementById('editOrderForm').reset();
+    editingOrderIndex = null;
+});
+
+// Function to edit an order
+function editOrder(index) {
+    editingOrderIndex = index;
+    const orders = JSON.parse(localStorage.getItem("orders")) || [];
+    const order = orders[index];
+
+    document.getElementById('editCustomerName').value = order.customerName;
+    document.getElementById('editDeliveryAddress').value = order.deliveryAddress;
+    document.getElementById('editContactNumber').value = order.contactNumber;
+    document.getElementById('editPaymentMethod').value = order.paymentMethod;
+
+    const productCheckboxes = document.querySelectorAll('.edit-product-checkbox');
+    productCheckboxes.forEach(checkbox => {
+        checkbox.checked = order.orderDetails.includes(checkbox.value);
+    });
+
+    const editModal = new bootstrap.Modal(document.getElementById('editOrderModal'));
+    editModal.show();
+}
+
+// Update the deleteOrder function
+async function deleteOrder(orderId) {
+    try {
+        // Show confirmation dialog
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+            const response = await fetch(`https://order-management-system-production-0adb.up.railway.app/api/orders/${orderId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete order');
+            }
+
+            await loadOrders(); // Refresh the table
+
+            Swal.fire(
+                'Deleted!',
+                'Order has been deleted.',
+                'success'
+            );
+        }
+    } catch (error) {
+        console.error('Error deleting order:', error);
+        Swal.fire(
+            'Error!',
+            'Failed to delete order.',
+            'error'
+        );
+    }
+}
+
+// Add new function to edit order status
+async function editOrder(orderId) {
+    try {
+        const { value: status } = await Swal.fire({
+            title: 'Update Order Status',
+            input: 'select',
+            inputOptions: {
+                'Pending': 'Pending',
+                'Completed': 'Completed',
+                'Cancelled': 'Cancelled'
+            },
+            inputPlaceholder: 'Select status',
+            showCancelButton: true,
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Please select a status!';
+                }
+            }
+        });
+
+        if (status) {
+            const response = await fetch(`https://order-management-system-production-0adb.up.railway.app/api/orders/${orderId}/status`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ status })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update status');
+            }
+
+            await loadOrders(); // Refresh the table
+
+            Swal.fire(
+                'Updated!',
+                'Order status has been updated.',
+                'success'
+            );
+        }
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        Swal.fire(
+            'Error!',
+            'Failed to update order status.',
+            'error'
+        );
+    }
+}
+
+// Update the window.onload function
+window.onload = function() {
+    // Check for authentication
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/frontend/login.html';
+        return;
+    }
+
+    // Set today's date as default
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('orderDateFilter').value = today;
+    
+    loadOrders();
+    loadProducts();
+
+    // Add search input event listener
+    const searchInput = document.getElementById('orderSearchInput');
+    let searchTimeout;
+    
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            loadOrders();
+        }, 300); // Debounce the search to avoid too many requests
+    });
+
+    // Add clear search button functionality
+    document.getElementById('clearSearch').addEventListener('click', function() {
+        document.getElementById('orderSearchInput').value = '';
+        loadOrders();
+    });
+
+    // Add sidebar toggle functionality
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    const mainContent = document.querySelector('.main-content');
+    
+    function checkScreenSize() {
+        if (window.innerWidth <= 768) {
+            sidebarToggle.classList.remove('d-none');
+            sidebar.classList.remove('sidebar-collapse');
+        } else if (window.innerWidth <= 992) {
+            sidebarToggle.classList.add('d-none');
+            sidebar.classList.add('sidebar-collapse');
+            sidebar.classList.remove('show');
+        } else {
+            sidebarToggle.classList.add('d-none');
+            sidebar.classList.remove('sidebar-collapse');
+            sidebar.classList.remove('show');
+        }
+    }
+    
+    // Initial check
+    checkScreenSize();
+    
+    // Toggle sidebar on button click
+    sidebarToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('show');
+    });
+    
+    // Check screen size on resize
+    window.addEventListener('resize', checkScreenSize);
+    
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+        if (window.innerWidth <= 768 && 
+            !sidebar.contains(event.target) && 
+            !sidebarToggle.contains(event.target)) {
+            sidebar.classList.remove('show');
+        }
+    });
+};
+
+// Add event listener for date filter changes
+document.getElementById('orderDateFilter').addEventListener('change', loadOrders);
+
+    </script>
+</body>
+
+</html>
